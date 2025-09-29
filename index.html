@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>缺氧工具集 - ONI Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --card-color: #ffffff;
+            --text-color: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.2);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #1a1a1a;
+            --secondary-color: #4a9fea;
+            --accent-color: #ff6b6b;
+            --background-color: #2d2d2d;
+            --card-color: #3d3d3d;
+            --text-color: #ffffff;
+            --text-light: #b0b0b0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.5);
+            --gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gradient);
+            min-height: 100vh;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #3498db, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .tool-card {
+            background: var(--card-color);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #e74c3c);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .tool-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .tool-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .tool-description {
+            color: var(--text-light);
+            line-height: 1.6;
+            font-size: 1.1em;
+            margin-bottom: 25px;
+        }
+
+        .tool-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .tool-features li {
+            padding: 8px 0;
+            color: var(--text-light);
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .tool-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .tool-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .tool-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 80px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            .logo {
+                font-size: 2.5em;
+            }
+
+            .subtitle {
+                font-size: 1.1em;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .tool-card {
+                padding: 30px 20px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tool-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .tool-card:nth-child(1) { animation-delay: 0.1s; }
+        .tool-card:nth-child(2) { animation-delay: 0.2s; }
+        .tool-card:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">🛠️ ONI Tools</h1>
+            <p class="subtitle">专为《缺氧》玩家打造的工具集合，助你轻松规划殖民地，解决生存难题</p>
+        </div>
+
+        <div class="tools-grid">
+            <div class="tool-card" onclick="navigateTo('food-calculator.html')">
+                <span class="tool-icon">🍽️</span>
+                <h2 class="tool-title">食物计算器</h2>
+                <p class="tool-description">精确计算复制人食物需求，优化农业布局</p>
+                <ul class="tool-features">
+                    <li>计算植物种植数量</li>
+                    <li>分析资源消耗</li>
+                    <li>优化食物生产链</li>
+                    <li>支持所有食物类型</li>
+                </ul>
+                <button class="tool-button">开始计算</button>
+            </div>
+
+            <div class="tool-card" onclick="navigateTo('rocket-calculator.html')">
+                <span class="tool-icon">🚀</span>
+                <h2 class="tool-title">火箭计算器</h2>
+                <p class="tool-description">规划太空任务，优化火箭配置</p>
+                <ul class="tool-features">
+                    <li>计算燃料需求</li>
+                    <li>规划载荷配置</li>
+                    <li>估算任务时间</li>
+                    <li>优化资源利用</li>
+                </ul>
+                <button class="tool-button">开始计算</button>
+            </div>
+
+            <div class="tool-card" onclick="navigateTo('geyser-calculator.html')">
+                <span class="tool-icon">🌋</span>
+                <h2 class="tool-title">泉计算器</h2>
+                <p class="tool-description">分析各种泉的资源产出，制定开发策略</p>
+                <ul class="tool-features">
+                    <li>计算泉的产出量</li>
+                    <li>分析温度变化</li>
+                    <li>规划开发方案</li>
+                    <li>优化能源利用</li>
+                </ul>
+                <button class="tool-button">开始计算</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 ONI Tools - 为《缺氧》玩家提供专业的计算工具</p>
+            <p>非官方工具，与Klei Entertainment无关</p>
+        </div>
+    </div>
+
+    <script>
+        // 主题切换功能
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+
+            const themeButton = document.querySelector('.theme-toggle');
+            themeButton.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // 检测系统主题偏好
+        function detectSystemTheme() {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const themeButton = document.querySelector('.theme-toggle');
+
+            if (mediaQuery.matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeButton.textContent = '☀️';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeButton.textContent = '🌙';
+            }
+        }
+
+        // 页面跳转
+        function navigateTo(url) {
+            if (url == "food-calculator.html") {
+                window.location.href = url;
+            } else {
+                alert("尽请期待~");
+            }
+        }
+
+        // 初始化
+        detectSystemTheme();
+
+        // 监听系统主题变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', detectSystemTheme);
+    </script>
+</body>
+</html>

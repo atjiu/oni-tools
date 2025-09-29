@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>复制人食物需求计算器</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-secondary: white;
+            --bg-tertiary: #f8f9fa;
+            --bg-card: white;
+            --text-primary: #2c3e50;
+            --text-secondary: #34495e;
+            --text-muted: #7f8c8d;
+            --text-light: #95a5a6;
+            --border-color: #e1e8ed;
+            --border-light: #ecf0f1;
+            --accent-primary: #3498db;
+            --accent-secondary: #e74c3c;
+            --accent-success: #27ae60;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2d2d2d;
+            --bg-card: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #b0b0b0;
+            --text-light: #888888;
+            --border-color: #404040;
+            --border-light: #505050;
+            --accent-primary: #4a9fea;
+            --accent-secondary: #ff6b6b;
+            --accent-success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .calculator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+            background: var(--bg-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .section {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .section-title::before {
+            content: "▶";
+            color: var(--accent-primary);
+            font-size: 0.8em;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-group label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"] {
+            padding: 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            width: 120px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1em;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 15px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .results-section {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .results-title {
+            font-size: 1.3em;
+            color: var(--accent-success);
+            margin-bottom: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .material-group {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .group-title {
+            font-size: 1.2em;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .ingredients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .ingredient-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .ingredient-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-light);
+            border-color: var(--accent-primary);
+        }
+
+        .ingredient-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .ingredient-details {
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .ingredient-path {
+            font-size: 0.85em;
+            color: var(--text-light);
+            font-style: italic;
+            border-top: 1px dashed var(--border-light);
+            padding-top: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .no-results {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 40px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .checkbox-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .ingredients-grid {
+                grid-template-columns: 1fr;
+            }
+
+            input[type="number"], select {
+                width: 100%;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+    // ... 食物、植物、动物数据保持不变 ...
+    const 食物 = {
+        "米虱": {"能量": 600, "制作机器": "生食"},
+        "肉": {"能量": 1600, "制作机器": "生食"},
+        "蘑菇": {"能量": 2400, "制作机器": "生食"},
+        "毛刺浆果": {"能量": 1600, "制作机器": "生食"},
+        "海生菜": {"能量": 400, "制作机器": "生食"},
+        "帕库鱼片": {"能量": 1000, "制作机器": "生食"},
+        "生蟹肉": {"能量": 1000, "制作机器": "生食"},
+        "生蛋": {"能量": 1600, "制作机器": "生食"},
+        "植物肉": {"能量": 1200, "制作机器": "生食"},
+        "沼浆果冻": {"能量": 1840, "制作机器": "生食"},
+        "虫果": {"能量": 250, "制作机器": "生食"},
+        "羽叶果薯": {"能量": 4000, "制作机器": "生食"},
+        "刺壳果": {"能量": 800, "制作机器": "生食"},
+        "贫瘠虫果": {"能量": 800, "制作机器": "生食"},
+        "颚鱼片": {"能量": 1000, "制作机器": "生食"},
+        "汗甜玉米": {"能量": 800, "制作机器": "生食"},
+
+        "软泥膏": {"能量": 800, "制作机器": "食物压制器", "配方": [[{"泥土": 75}], [{"水": 75}]]},
+        "米虱糕": {"能量": 1700, "制作机器": "食物压制器", "配方": [[{"米虱": 2}], [{"水": 50}]]},
+        "豆腐": {"能量": 3600, "制作机器": "食物压制器", "配方": [[{"小吃豆": 6}], [{"水": 50}]]},
+        "浆果糕": {"能量": 4000, "制作机器": "食物压制器", "配方": [[{"冰霜麦粒": 5}, {"巨蕨谷粒": 5}], [{"毛刺浆果": 1}, {"刺壳果": 2}]]},
+        "干肉饼": {"能量": 2600, "制作机器": "食物压制器", "配方": [[{"肉": 1}], [{"动物油脂": 1}]]},
+
+        "腌制米虱": {"能量": 1800, "制作机器": "电动烤炉", "配方": [[{"米虱": 3}]]},
+        "煎泥膏": {"能量": 1050, "制作机器": "电动烤炉", "配方": [[{"软泥膏": 1}]]},
+        "炙烤刺果": {"能量": 2000, "制作机器": "电动烤炉", "配方": [[{"毛刺浆果": 1}]]},
+        "煎蘑菇": {"能量": 2800, "制作机器": "电动烤炉", "配方": [[{"蘑菇": 1}]]},
+        "冰霜面包": {"能量": 1200, "制作机器": "电动烤炉", "配方": [[{"冰霜麦粒": 3}, {"巨蕨谷粒": 3}]]},
+        "煎蛋卷": {"能量": 2800, "制作机器": "电动烤炉", "配方": [[{"生蛋": 1}]]},
+        "烤肉串": {"能量": 4000, "制作机器": "电动烤炉", "配方": [[{"肉": 2}]]},
+        "烤海鲜": {"能量": 1600, "制作机器": "电动烤炉", "配方": [[{"帕库鱼片": 1}, {"生蟹肉": 1}]]},
+        "蛋奶酥煎饼": {"能量": 3600, "制作机器": "电动烤炉", "配方": [[{"生蛋": 1}], [{"冰霜麦粒": 2}, {"巨蕨谷粒": 2}]]},
+        "沼泽欢愉": {"能量": 2240, "制作机器": "电动烤炉", "配方": [[{"沼浆果冻": 1}]]},
+        "烤虫果仁": {"能量": 1200, "制作机器": "电动烤炉", "配方": [[{"贫瘠虫果": 1}]]},
+        "虫果果酱": {"能量": 2400, "制作机器": "电动烤炉", "配方": [[{"虫果": 8}], [{"蔗糖": 4}]]},
+        "刺壳果烤串": {"能量": 1200, "制作机器": "电动烤炉", "配方": [[{"刺壳果": 1}]]},
+
+        "浆果酿": {"能量": 4400, "制作机器": "燃气灶", "配方": [[{"炙烤刺果": 2}], [{"火椒粒": 2}]]},
+        "蘑菇卷": {"能量": 4800, "制作机器": "燃气灶", "配方": [[{"煎蘑菇": 1}], [{"海生菜": 4}]]},
+        "海陆双拼": {"能量": 6000, "制作机器": "燃气灶", "配方": [[{"烤肉串": 1}], [{"烤海鲜": 1}]]},
+        "火椒面包": {"能量": 4000, "制作机器": "燃气灶", "配方": [[{"冰霜麦粒": 10}, {"巨蕨谷粒": 10}], [{"火椒粒": 1}]]},
+        "麻婆豆腐": {"能量": 4000, "制作机器": "燃气灶", "配方": [[{"豆腐": 1}], [{"火椒粒": 1}]]},
+        "蘑菇乳蛋饼": {"能量": 6400, "制作机器": "燃气灶", "配方": [[{"煎蛋卷": 1}], [{"海生菜": 1}], [{"煎蘑菇": 1}]]},
+        "冰霜汉堡": {"能量": 6000, "制作机器": "燃气灶", "配方": [[{"冰霜面包": 1}], [{"海生菜": 1}], [{"烤肉串": 1}]]},
+        "咖喱豆": {"能量": 5000, "制作机器": "燃气灶", "配方": [[{"滋补根": 4}], [{"小吃豆": 4}]]},
+        "混合浆果派": {"能量": 4200, "制作机器": "燃气灶", "配方": [[{"冰霜麦粒": 3}, {"巨蕨谷粒": 3}], [{"虫果": 4}], [{"炙烤刺果": 1}, {"刺壳果烤串": 1.6667}, {"漫花果": 6.153}]]},
+
+        "果薯条": {"能量": 5400, "制作机器": "油炸锅", "配方": [[{"羽叶果薯": 1}], [{"动物油脂": 1}]]},
+        "炸豆小吃": {"能量": 5000, "制作机器": "油炸锅", "配方": [[{"小吃豆": 6}], [{"动物油脂": 1}]]},
+        "鱼肉卷": {"能量": 4200, "制作机器": "油炸锅", "配方": [[{"帕库鱼片": 1}], [{"动物油脂": 2.4}], [{"冰霜面包": 2}], [{"巨蕨谷粒": 2}]]},
+        "蟹肉天妇罗": {"能量": 4200, "制作机器": "油炸锅", "配方": [[{"生蟹肉": 1}], [{"动物油脂": 2.4}], [{"冰霜面包": 2}], [{"巨蕨谷粒": 2}]]},
+
+        "嫩肋排": {"能量": 16000, "制作机器": "熏炉", "配方": [[{"硬肉": 6}], [{"木材": 100}, {"泥炭": 100}]]},
+        "熏鱼": {"能量": 4200, "制作机器": "熏炉", "配方": [[{"帕库鱼片": 6}, {"颚鱼片": 6}], [{"木材": 100}, {"泥炭": 100}]]},
+        "爆米花": {"能量": 2862.5, "制作机器": "熏炉", "产量":4 ,"配方": [[{"汗甜玉米": 7}, {"刺壳果": 7}, {"贫瘠虫果": 7}], [{"木材": 100}, {"泥炭": 100}]]},
+    };
+    const 植物 = {
+        "米虱木": {"生长周期": [3,12], "人工培育": {"施肥": {"泥土":[10,0]}}, "米虱": {"数量": 1, "能量": 600}},
+        "毛刺花": {"生长周期": [6,24], "人工培育": {"灌溉": {"水":[20,0]}}, "毛刺浆果": {"数量": 1, "能量": 1600}},
+        "夜幕菇": {"生长周期": [7.5,30], "人工培育": {"施肥": {"菌泥":[4,0]}}, "蘑菇": {"数量": 1, "能量": 2400}},
+        "冰霜小麦": {"生长周期": [18,72], "人工培育": {"灌溉": {"水":[20,0]}, "施肥": {"泥土":[5,0]}}, "冰霜麦粒": {"数量": 18}},
+        "小吃芽": {"生长周期": [21,84], "人工培育": {"灌溉": {"乙醇":[20,0]}, "施肥": {"泥土":[5,0]}}, "小吃豆": {"数量": 12}},
+        "水草": {"生长周期": [12,48], "人工培育": {"灌溉": {"盐水":[5,0]}, "施肥": {"漂白石":[0.5,0]}}, "海生菜": {"数量": 12, "能量": 4800}},
+        "火椒藤": {"生长周期": [8,32], "人工培育": {"灌溉": {"污染水":[35,0]}, "施肥": {"磷矿":[1,0]}}, "火椒粒": {"数量": 4}},
+        "沼浆笼": {"生长周期": [6.6,26.4], "人工培育": {"灌溉": {"污染水":[40,0]}}, "沼浆果冻": {"数量": 1, "能量": 1840}},
+        "贫瘠虫果芽": {"生长周期": [4,16], "人工培育": {"施肥": {"硫":[10,0]}}, "贫瘠虫果": {"数量": 1, "能量": 800}},
+        "虫果芽": {"生长周期": [8,32], "人工培育": {"施肥": {"硫":[10,0]}}, "虫果": {"数量": 8, "能量": 2000}},
+        "土星动物捕草": {"生长周期": [30,120], "人工培育": {"灌溉": {"污染水":[10,0]}}, "植物肉": {"数量": 10, "能量": 12000}},
+        "刺壳果灌木": {"生长周期": [3,12], "人工培育": {"施肥": {"磷矿":[5,0]}}, "刺壳果": {"数量": 1, "能量": 800}},
+        "羽叶果薯植株": {"生长周期": [9,36], "人工培育": {"灌溉": {"乙醇":[15,0]}}, "羽叶果薯": {"数量": 1, "能量": 4000}},
+        "汗甜玉米杆": {"生长周期": [3,12], "人工培育": {"施肥": {"泥炭":[10,0]}}, "汗甜玉米": {"数量": 1, "能量": 800}},
+        "巨蕨": {"生长周期": [9,36], "人工培育": {"灌溉": {"氯气":[54,13.5]}}, "巨蕨谷粒": {"数量": 36}},
+        "乔木树": {"生长周期": [4.5,18], "人工培育": {"灌溉": {"污染水":[70,0]}, "施肥": {"泥土":[10,0]}}, "木材": {"数量": 300}},
+    };
+    const 动物 = {
+        "绒犸兔": {"寿命":200,"死亡掉落":{"肉":14}},
+        "皇犸兔": {"寿命":200,"死亡掉落":{"肉":14}},
+        "逸蜥": {"寿命":50,"死亡掉落":{"肉":0.5}},
+        "沙泥蟹": {"寿命":100,"死亡掉落":{"生蟹肉":4}},
+        "狐鹿": {"寿命":100,"死亡掉落":{"肉":1}},
+        "甜素甲虫": {"寿命":75,"死亡掉落":{"肉":1}},
+        "毛鳞壁虎": {"寿命":150,"死亡掉落":{"肉":2}},
+        "虫果果虫": {"寿命":150,"死亡掉落":{"肉":3}},
+        "滑鳞壁虎": {"寿命":150,"死亡掉落":{"肉":2}},
+        "好吃哈奇": {"寿命":100,"死亡掉落":{"肉":2}},
+        "石壳哈奇": {"寿命":100,"死亡掉落":{"肉":2}},
+        "光滑哈奇": {"寿命":100,"死亡掉落":{"肉":2}},
+        "草质哈奇": {"寿命":100,"死亡掉落":{"肉":2}},
+        "锹环田鼠": {"寿命":100,"死亡掉落":{"肉":10}},
+        "珍馐田鼠": {"寿命":100,"死亡掉落":{"肉":5}},
+        "释气海牛": {"寿命":75,"死亡掉落":{"肉":10}},
+        "浮油生物": {"寿命":100,"死亡掉落":{"肉":2}},
+        "长毛浮油生物": {"寿命":150,"死亡掉落":{"肉":2}},
+        "熔岩浮油生物": {"寿命":100,"死亡掉落":{"肉":2}},
+        "帕库鱼": {"寿命":25,"死亡掉落":{"帕库鱼片":1}},
+        "大嘴鱼": {"寿命":25,"死亡掉落":{"帕库鱼片":1}},
+        "热带帕库鱼": {"寿命":25,"死亡掉落":{"帕库鱼片":1}},
+        "颚鱼": {"寿命":100,"死亡掉落":{"颚鱼片":12}},
+        "喷浮飞鱼": {"寿命":75,"死亡掉落":{"肉":1}},
+        "贵族飞鱼": {"寿命":75,"死亡掉落":{"肉":1}},
+        "洁净飞鱼": {"寿命":75,"死亡掉落":{"肉":1}},
+        "厚壳飞鱼": {"寿命":75,"死亡掉落":{"肉":1}},
+        "霸王鹦": {"寿命":200,"死亡掉落":{"硬肉":5}},
+        "栓角海豹": {"寿命":100,"死亡掉落":{"动物油脂":50}},
+        "树鼠": {"寿命":100,"死亡掉落":{"肉":1}},
+        "毛绒树鼠": {"寿命":100,"死亡掉落":{"肉":1}},
+        "电弧蛞蝓": {"寿命":100,"死亡掉落":{"肉":2}},
+        "烟雾蛞蝓": {"寿命":100,"死亡掉落":{"肉":2}},
+        "海绵蛞蝓": {"寿命":100,"死亡掉落":{"肉":2}},
+        "尖块兽": {"寿命":200,"死亡掉落":{"硬肉":12}},
+    };
+
+    function FoodCalculator(){
+        const [personNumber, setPersonNumber] = React.useState(12);
+        const [bigPersonNumber, setBigPersonNumber] = React.useState(0);
+        const [wildPlant, setWildPlant] = React.useState(false);
+        const [dupHarvest, setDupHarvest] = React.useState(true);
+        const [fertilization, setFertilization] = React.useState(false);
+        const [foodMachine, setFoodMachine] = React.useState("");
+        const [food, setFood] = React.useState("");
+        const [result, setResult] = React.useState([]);
+        const [isDarkTheme, setIsDarkTheme] = React.useState(false);
+
+        React.useEffect(() => {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            setIsDarkTheme(mediaQuery.matches);
+
+            const handleChange = (e) => {
+                setIsDarkTheme(e.matches);
+            };
+
+            mediaQuery.addEventListener('change', handleChange);
+            return () => mediaQuery.removeEventListener('change', handleChange);
+        }, []);
+
+        React.useEffect(() => {
+            document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
+        }, [isDarkTheme]);
+
+        const toggleTheme = () => {
+            setIsDarkTheme(!isDarkTheme);
+        };
+
+        const calculateRequirements = () => {
+            if (food == "" || food == null) return;
+
+            let calcResult = [];
+            let foodInfo = 食物[food];
+            let totalCaloriesNeeded = (personNumber * 1000) + bigPersonNumber * 500;
+            let portionsNeeded = totalCaloriesNeeded / (foodInfo["能量"]*(食物[food]["产量"]||1));
+
+            const findMaterialSources = (materialName, materialAmount, path = []) => {
+                let sources = [];
+                if (path.includes(materialName)) return sources;
+                let newPath = [...path, materialName];
+
+                let materialPlants = Object.entries(植物).filter(([plantName, plantInfo]) => {
+                    return plantInfo[materialName] != null;
+                });
+
+                let materialAnimals = Object.entries(动物).filter(([animalName, animalInfo]) => {
+                    return animalInfo["死亡掉落"][materialName] != null;
+                });
+
+                if (materialPlants.length > 0 || materialAnimals.length > 0) {
+                    materialPlants.forEach(([plantName, plantInfo]) => {
+                        let cycle = wildPlant ? plantInfo["生长周期"][1] : plantInfo["生长周期"][0];
+                        if (fertilization && plantName !== "米虱木") cycle /= 2;
+                        if (!dupHarvest) cycle += (plantName === "乔木树" ? 20 : 4);
+
+                        let outputPerCycle = plantInfo[materialName]["数量"] || 1;
+                        let plantCount = parseFloat(materialAmount * cycle / outputPerCycle).toFixed(2);
+
+                        // 计算植物消耗的资源
+                        let resourceConsumption = [];
+                        if (plantInfo["人工培育"]) {
+                            Object.entries(plantInfo["人工培育"]).forEach(([action, resources]) => {
+                                Object.entries(resources).forEach(([resourceName, resourceAmount]) => {
+                                    // 计算每周期消耗的资源量
+                                    let consumptionPerCycle = resourceAmount[wildPlant?1:0] * plantCount;
+                                    resourceConsumption.push({
+                                        资源: resourceName,
+                                        数量: parseFloat(consumptionPerCycle).toFixed(2),
+                                        单位: "千克/周期"
+                                    });
+                                });
+                            });
+                        }
+
+                        sources.push({
+                            名称: plantName + " → " + materialName,
+                            数量: plantCount,
+                            单位: "株",
+                            来源: [...newPath, plantName],
+                            资源消耗: resourceConsumption.length > 0 ? resourceConsumption : null
+                        });
+                    });
+
+                    materialAnimals.forEach(([animalName, animalInfo]) => {
+                        let dropAmount = animalInfo["死亡掉落"][materialName];
+                        let animalCount = parseFloat(materialAmount * animalInfo["寿命"] / dropAmount).toFixed(2);
+
+                        sources.push({
+                            名称: animalName + " → " + materialName,
+                            数量: animalCount,
+                            单位: "只",
+                            来源: [...newPath, animalName]
+                        });
+                    });
+                    return sources;
+                }
+
+                let intermediateFood = 食物[materialName];
+                if (intermediateFood && intermediateFood.配方) {
+                    let intermediatePortionsNeeded = materialAmount;
+                    intermediateFood.配方.forEach((intermediateGroup, groupIndex) => {
+                        intermediateGroup.forEach(intermediateMaterialObj => {
+                            Object.entries(intermediateMaterialObj).forEach(([intermediateMaterialName, intermediateMaterialAmount]) => {
+                                let totalIntermediateMaterialNeeded = intermediateMaterialAmount * intermediatePortionsNeeded;
+                                let intermediateSources = findMaterialSources(
+                                    intermediateMaterialName,
+                                    totalIntermediateMaterialNeeded,
+                                    newPath
+                                );
+                                sources.push(...intermediateSources);
+                            });
+                        });
+                    });
+                } else {
+                    sources.push({
+                        名称: materialName,
+                        数量: parseFloat(materialAmount).toFixed(2),
+                        单位: "千克/周期",
+                        来源: newPath
+                    });
+                }
+                return sources;
+            };
+
+            let recipes = foodInfo["配方"] ? foodInfo["配方"] : [[{[food]: 1}]];
+
+            recipes.forEach((materialGroup, groupIndex) => {
+                let groupName = foodInfo["配方"] ? `材料组 ${groupIndex + 1}` : food;
+                let groupResult = {name: groupName, ingredients: []};
+
+                materialGroup.forEach(materialObj => {
+                    let orGroup = [];
+                    Object.entries(materialObj).forEach(([materialName, materialAmount]) => {
+                        let totalMaterialNeeded = materialAmount * portionsNeeded;
+                        let materialSources = findMaterialSources(materialName, totalMaterialNeeded);
+                        orGroup.push(...materialSources);
+                    });
+                    if (orGroup.length > 0) {
+                        groupResult.ingredients.push(...orGroup);
+                    }
+                });
+
+                if (groupResult.ingredients.length > 0) {
+                    calcResult.push(groupResult);
+                }
+            });
+
+            setResult(calcResult);
+        };
+
+        React.useEffect(() => {
+            if (personNumber < bigPersonNumber) {
+                setBigPersonNumber(personNumber);
+            }
+        }, [personNumber]);
+
+        React.useEffect(() => {
+            calculateRequirements();
+        }, [personNumber, bigPersonNumber, wildPlant, dupHarvest, fertilization, food]);
+
+        return (
+            <div className="calculator-container">
+                <div className="header">
+                    <button className="theme-toggle" onClick={toggleTheme} title="切换主题">
+                        {isDarkTheme ? '☀️' : '🌙'}
+                    </button>
+                    <h1>🏗️ 复制人食物需求计算器</h1>
+                    <p>计算氧气不是第一需要的食物需求，精准规划你的殖民地</p>
+                </div>
+
+                <div className="content">
+                    <div className="section">
+                        <div className="section-title">👥 复制人配置</div>
+                        <div className="input-group">
+                            <label>复制人数量:</label>
+                            <input
+                                type="number"
+                                step="1"
+                                min="1"
+                                value={personNumber}
+                                onChange={e => setPersonNumber(parseInt(e.target.value) || 12)}
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label>无底洞之胃:</label>
+                            <input
+                                type="number"
+                                step="1"
+                                min="0"
+                                max={personNumber}
+                                value={bigPersonNumber}
+                                onChange={e => setBigPersonNumber(parseInt(e.target.value) || 0)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <div className="section-title">⚙️ 农业配置</div>
+                        <div className="checkbox-group">
+                            <div className="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="植物野生"
+                                    checked={wildPlant}
+                                    onChange={e=>setWildPlant(e.target.checked)}
+                                />
+                                <label htmlFor="植物野生">植物野生</label>
+                            </div>
+                            <div className="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="人工收获"
+                                    checked={dupHarvest}
+                                    onChange={e=>setDupHarvest(e.target.checked)}
+                                />
+                                <label htmlFor="人工收获">人工收获</label>
+                            </div>
+                            <div className="checkbox-item">
+                                <input
+                                    type="checkbox"
+                                    id="施肥"
+                                    checked={fertilization}
+                                    onChange={e=>setFertilization(e.target.checked)}
+                                />
+                                <label htmlFor="施肥">施肥加速</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="section">
+                        <div className="section-title">🍽️ 食物选择</div>
+                        <div className="input-group">
+                            <label>制作机器:</label>
+                            <select onChange={e=>setFoodMachine(e.target.value)}>
+                                <option value="">选择制作机器</option>
+                                <option value="生食">生食</option>
+                                <option value="食物压制器">食物压制器</option>
+                                <option value="电动烤炉">电动烤炉</option>
+                                <option value="燃气灶">燃气灶</option>
+                                <option value="油炸锅">油炸锅</option>
+                                <option value="熏炉">熏炉</option>
+                            </select>
+                        </div>
+                        <div className="input-group">
+                            <label>选择食物:</label>
+                            <select onChange={e=>setFood(e.target.value)}>
+                                <option value="">选择食物</option>
+                                {foodMachine ?
+                                    Object.keys(Object.fromEntries(
+                                        Object.entries(食物).filter(([食物名称, 食物信息]) => 食物信息["制作机器"] === foodMachine)
+                                    )).map(foodName => <option key={foodName} value={foodName}>{foodName}</option>):null}
+                            </select>
+                        </div>
+                    </div>
+
+                    {result && result.length > 0 && (
+                        <div className="results-section">
+                            <div className="results-title">📊 计算结果</div>
+                            {result.map((item, idx1) => (
+                                <div key={"group_"+idx1} className="material-group">
+                                    <div className="group-title">{item.name}</div>
+                                    <div className="ingredients-grid">
+                                        {item.ingredients.map((recipe, idx2) => (
+                                            <div key={"recipe_"+idx1+"_"+idx2} className="ingredient-card">
+                                                <div className="ingredient-name">{recipe["名称"]}</div>
+                                                <div className="ingredient-details">
+                                                    数量: {recipe["数量"]} {recipe["单位"]}
+                                                </div>
+                                                {recipe.来源 && (
+                                                    <div className="ingredient-path">
+                                                        来源: {recipe.来源.join(' → ')}
+                                                    </div>
+                                                )}
+                                                {recipe.资源消耗 && recipe.资源消耗.length > 0 && (
+                                                    <div className="resource-consumption" style={{marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed var(--border-light)'}}>
+                                                        <div style={{fontSize: '0.8em', color: 'var(--accent-secondary)', marginBottom: '4px'}}>
+                                                            资源消耗:
+                                                        </div>
+                                                        {recipe.资源消耗.map((resource, idx) => (
+                                                            <div key={idx} style={{fontSize: '0.75em', color: 'var(--text-muted)'}}>
+                                                                • {resource.资源}: {resource.数量} {resource.单位}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {result && result.length === 0 && food && (
+                        <div className="no-results">
+                            🎉 无需额外原料！这是一个基础食物。
+                        </div>
+                    )}
+                </div>
+            </div>
+        )
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<FoodCalculator />);
+</script>
+</body>
+</html>
