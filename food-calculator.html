@@ -701,13 +701,15 @@
                             let dropAmount = animalInfo["死亡掉落"][materialName] * (creatureMode == "wild" ? 1: (eggCount+1));
                             animalCount = parseFloat(materialAmount * animalInfo["寿命"] / dropAmount).toFixed(2);
                         }
-                        sources.push({
-                            名称: animalName + " → " + materialName,
-                            数量: animalCount,
-                            单位: "只",
-                            来源: [...newPath, animalName],
-                            说明: description || undefined
-                        });
+                        if (!isNaN(animalCount)) {
+                            sources.push({
+                                名称: animalName + " → " + materialName,
+                                数量: animalCount,
+                                单位: "只",
+                                来源: [...newPath, animalName],
+                                说明: description || undefined
+                            });
+                        }
                     });
                     return sources;
                 }
@@ -762,6 +764,20 @@
                 }
             });
 
+            calcResult.forEach(item => {
+                if (item.ingredients) {
+                    item.ingredients.sort((a, b) => {
+                        const numA = parseFloat(a.数量);
+                        const numB = parseFloat(b.数量);
+
+                        if (isNaN(numA) && isNaN(numB)) return 0;
+                        if (isNaN(numA)) return 1;
+                        if (isNaN(numB)) return -1;
+
+                        return numA - numB;
+                    });
+                }
+            });
             setResult(calcResult);
         };
 
@@ -812,7 +828,7 @@
                     </div>
 
                     <div className="section">
-                        <div className="section-title">⚙️ 农业配置</div>
+                        <div className="section-title">🌱 农业配置</div>
                         <div className="checkbox-group">
                             <div className="checkbox-item">
                                 <input
@@ -845,7 +861,7 @@
                     </div>
 
                     <div className="section">
-                        <div className="section-title">⚙️ 畜牧配置</div>
+                        <div className="section-title">🐄 畜牧配置</div>
                         <div className="checkbox-group">
                             <div className="checkbox-item">
                                 <input
