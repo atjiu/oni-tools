@@ -148,6 +148,8 @@
             gap: 15px;
             margin-bottom: 15px;
             flex-wrap: wrap;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .input-group label {
@@ -873,7 +875,7 @@
                     <div className="section">
                         <div className="section-title">🍽️ 食物选择</div>
                         <div className="input-group">
-                            <label>制作机器:</label>
+                            <div>制作机器:</div>
                             <div className="radio-group">
                                 {[...new Set(Object.values(食物).map(食物信息 => 食物信息["制作机器"]))].map(机器 => (
                                     <label key={机器} className="radio-item">
@@ -895,7 +897,7 @@
 
                         {foodMachine && (
                             <div className="input-group" style={{marginTop: '15px'}}>
-                                <label>选择食物:</label>
+                                <div>选择食物:</div>
                                 <div className="radio-group">
                                     {Object.entries(食物)
                                         .filter(([食物名称, 食物信息]) => 食物信息["制作机器"] === foodMachine)
