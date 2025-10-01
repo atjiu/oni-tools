@@ -671,17 +671,17 @@
         const 石油引擎_质量 = 200;
         const 液氢引擎_质量 = 500;
 
-        const 仓体_指挥舱_质量 = 200;
-        const 仓体_研究舱_质量 = 200;
-        const 仓体_货舱_质量 = 2000;
-        const 仓体_液缸货舱_质量 = 1000;
-        const 仓体_观光舱_质量 = 200;
-        const 仓体_固体燃料推进器_质量 = 1000;
-        const 仓体_生物货舱_质量 = 1000;
-        const 仓体_气罐货舱_质量 = 1000;
-        const 仓体_固体氧化剂舱_质量 = 100; const 仓体_固体氧化剂舱_容量 = 2700;
-        const 仓体_液体氧化剂舱_质量 = 100; const 仓体_液体氧化剂舱_容量 = 2700;
-        const 仓体_液缸燃料舱_质量 = 100; const 仓体_液缸燃料舱_容量 = 900;
+        const 舱体_指挥舱_质量 = 200;
+        const 舱体_研究舱_质量 = 200;
+        const 舱体_货舱_质量 = 2000;
+        const 舱体_液缸货舱_质量 = 1000;
+        const 舱体_观光舱_质量 = 200;
+        const 舱体_固体燃料推进器_质量 = 1000;
+        const 舱体_生物货舱_质量 = 1000;
+        const 舱体_气罐货舱_质量 = 1000;
+        const 舱体_固体氧化剂舱_质量 = 100; const 舱体_固体氧化剂舱_容量 = 2700;
+        const 舱体_液体氧化剂舱_质量 = 100; const 舱体_液体氧化剂舱_容量 = 2700;
+        const 舱体_液缸燃料舱_质量 = 100; const 舱体_液缸燃料舱_容量 = 900;
 
         const [engine, setEngine] = React.useState("蒸汽引擎");
         const [oxidizer, setOxidizer] = React.useState("氧石");
@@ -733,25 +733,25 @@
                 baseMass += 液氢引擎_质量;
             }
 
-            baseMass += commandCapsule * 仓体_指挥舱_质量;
-            baseMass += researchModule * 仓体_研究舱_质量;
-            baseMass += cargoBay * 仓体_货舱_质量;
-            baseMass += liquidCargoBay * 仓体_液缸货舱_质量;
-            baseMass += sightSeeingModule * 仓体_观光舱_质量;
-            baseMass += biologicalCargoBay * 仓体_生物货舱_质量;
-            baseMass += gasCargoCanister * 仓体_气罐货舱_质量;
+            baseMass += commandCapsule * 舱体_指挥舱_质量;
+            baseMass += researchModule * 舱体_研究舱_质量;
+            baseMass += cargoBay * 舱体_货舱_质量;
+            baseMass += liquidCargoBay * 舱体_液缸货舱_质量;
+            baseMass += sightSeeingModule * 舱体_观光舱_质量;
+            baseMass += biologicalCargoBay * 舱体_生物货舱_质量;
+            baseMass += gasCargoCanister * 舱体_气罐货舱_质量;
 
             const calculateDistance = (fuelAmount, fuelTanks, oxidizerTanks, thrusters = 0) => {
                 let totalMass = baseMass;
 
                 if (engine === "蒸汽引擎") {
-                    totalMass += fuelAmount + thrusters * 仓体_固体燃料推进器_质量;
+                    totalMass += fuelAmount + thrusters * 舱体_固体燃料推进器_质量;
                     const baseFlightDistance = 燃料_蒸汽 * fuelAmount;
                     const massPenalty = Math.max(totalMass, Math.pow(totalMass / 300, 3.2));
                     return baseFlightDistance - massPenalty + thrusters * 12000;
                 } else {
-                    totalMass += fuelTanks * 仓体_液缸燃料舱_质量 +
-                                oxidizerTanks * 仓体_液体氧化剂舱_质量 +
+                    totalMass += fuelTanks * 舱体_液缸燃料舱_质量 +
+                                oxidizerTanks * 舱体_液体氧化剂舱_质量 +
                                 fuelAmount * 2;
 
                     let fuelType = 0;
@@ -821,8 +821,8 @@
                     solution: solution,
                 });
             } else {
-                const fuelTankCapacity = 仓体_液缸燃料舱_容量;
-                const oxidizerTankCapacity = 仓体_液体氧化剂舱_容量;
+                const fuelTankCapacity = 舱体_液缸燃料舱_容量;
+                const oxidizerTankCapacity = 舱体_液体氧化剂舱_容量;
 
                 const findLiquidSolution = (oxidizerTanks, maxOxidizerTanks = 6) => {
                     if (oxidizerTanks > maxOxidizerTanks) return null;
@@ -958,6 +958,9 @@
                                             checked={oxidizer === "氧石"}
                                             onChange={e => setOxidizer("氧石")}
                                         />
+                                        {贴图["氧石"] && (
+                                            <img src={贴图["氧石"]} alt="氧石" className="radio-icon" />
+                                        )}
                                         <span>氧石</span>
                                     </label>
                                     <label className="radio-item">
@@ -989,7 +992,7 @@
                     </div>
 
                     <div className="section">
-                        <div className="section-title">🧩 仓体配置</div>
+                        <div className="section-title">🧩 舱体配置</div>
                         <div className="module-grid">
                             <div className="module-item">
                                 <div className="ingredient-with-icon">
@@ -1111,9 +1114,9 @@
                                     <div className="module-item">
                                         <div className="ingredient-with-icon">
                                             {贴图["液缸燃料舱"] && (
-                                                <img src={贴图["液缸燃料舱"]} alt="液体燃料仓" className="module-icon" />
+                                                <img src={贴图["液缸燃料舱"]} alt="液体燃料舱" className="module-icon" />
                                             )}
-                                            <div className="module-label">液体燃料仓</div>
+                                            <div className="module-label">液体燃料舱</div>
                                         </div>
                                         <input
                                             type="number"
@@ -1125,9 +1128,9 @@
                                     <div className="module-item">
                                         <div className="ingredient-with-icon">
                                             {贴图["液体氧化剂舱"] && (
-                                                <img src={贴图["液体氧化剂舱"]} alt="液体氧化剂仓" className="module-icon" />
+                                                <img src={贴图["液体氧化剂舱"]} alt="液体氧化剂舱" className="module-icon" />
                                             )}
-                                            <div className="module-label">液体氧化剂仓</div>
+                                            <div className="module-label">液体氧化剂舱</div>
                                         </div>
                                         <input
                                             type="number"
@@ -1194,10 +1197,10 @@
                                             {calculationResult.solution.fuelTanks && (
                                                 <div className="result-item">
                                                     <div className="result-item-icon">
-                                                        {贴图["液缸燃料舱"] && <img src={贴图["液缸燃料舱"]} alt="燃料仓" className="fuel-icon" />}
+                                                        {贴图["液缸燃料舱"] && <img src={贴图["液缸燃料舱"]} alt="燃料舱" className="fuel-icon" />}
                                                     </div>
                                                     <div className="result-item-text">
-                                                        <div className="result-item-label">燃料仓</div>
+                                                        <div className="result-item-label">燃料舱</div>
                                                         <div className="result-item-value">{calculationResult.solution.fuelTanks} 个</div>
                                                     </div>
                                                 </div>
@@ -1205,10 +1208,10 @@
                                             {calculationResult.solution.oxidizerTanks && (
                                                 <div className="result-item">
                                                     <div className="result-item-icon">
-                                                        {贴图["液体氧化剂舱"] && <img src={贴图["液体氧化剂舱"]} alt="氧化剂仓" className="fuel-icon" />}
+                                                        {贴图["液体氧化剂舱"] && <img src={贴图["液体氧化剂舱"]} alt="氧化剂舱" className="fuel-icon" />}
                                                     </div>
                                                     <div className="result-item-text">
-                                                        <div className="result-item-label">氧化剂仓</div>
+                                                        <div className="result-item-label">氧化剂舱</div>
                                                         <div className="result-item-value">{calculationResult.solution.oxidizerTanks} 个</div>
                                                     </div>
                                                 </div>
@@ -1224,7 +1227,7 @@
                             <div className="result-content">
                                 <div className="result-content">
                                     <div className="result-error">❌ 无法到达目标距离</div>
-                                    <div className="result-tip">请尝试减少仓体数量或缩短飞行距离</div>
+                                    <div className="result-tip">请尝试减少舱体数量或缩短飞行距离</div>
                                 </div>
                             </div>
                         </div>
