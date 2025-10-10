@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>缺氧液体数据</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-secondary: white;
+            --bg-tertiary: #f8f9fa;
+            --bg-card: white;
+            --text-primary: #2c3e50;
+            --text-secondary: #34495e;
+            --text-muted: #7f8c8d;
+            --text-light: #95a5a6;
+            --border-color: #e1e8ed;
+            --border-light: #ecf0f1;
+            --accent-primary: #3498db;
+            --accent-secondary: #e74c3c;
+            --accent-success: #27ae60;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2d2d2d;
+            --bg-card: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #b0b0b0;
+            --text-light: #888888;
+            --border-color: #404040;
+            --border-light: #505050;
+            --accent-primary: #4a9fea;
+            --accent-secondary: #ff6b6b;
+            --accent-success: #2ecc71;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .calculator-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+            background: var(--bg-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .table-container {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid var(--border-color);
+            overflow-x: auto;
+            transition: all 0.3s ease;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        th:hover {
+            background: var(--border-color);
+            cursor: pointer;
+        }
+
+        th:active {
+            transform: translateY(1px);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        tr:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+
+        .liquid-with-icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .liquid-icon {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .liquid-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .temperature-cell {
+            font-family: 'Courier New', monospace;
+            color: var(--accent-secondary);
+            font-weight: 500;
+        }
+
+        .heat-capacity {
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+
+        .mass-cell {
+            font-weight: 500;
+        }
+        .density-cell {
+            font-family: 'Courier New', monospace;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .table-container {
+                padding: 15px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+                font-size: 0.9em;
+            }
+
+            .liquid-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const liquid = [
+            {
+                "elementId": "Brine",
+                "maxMass": 1200,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 3.4,
+                "thermalConductivity": 0.609,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 250.65,
+                "highTemp": 375.9,
+                "lowTempTransitionTarget": "BrineIce",
+                "highTempTransitionTarget": "Steam",
+                "highTempTransitionOreId": "Salt",
+                "highTempTransitionOreMassConversion": 0.3,
+                "defaultTemperature": 282.15,
+                "defaultMass": 1200,
+                "molarMass": 22,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.25,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": ["AnyWater"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.BRINE.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "Chlorine",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 180,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 0.48,
+                "thermalConductivity": 0.0081,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 172.17,
+                "highTemp": 238.55,
+                "lowTempTransitionTarget": "SolidChlorine",
+                "highTempTransitionTarget": "ChlorineGas",
+                "defaultTemperature": 200,
+                "defaultMass": 600,
+                "molarMass": 34.453,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.73,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.CHLORINE.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "CrudeOil",
+                "maxMass": 870,
+                "liquidCompression": 1.01,
+                "speed": 50,
+                "minHorizontalFlow": 0.1,
+                "minVerticalFlow": 0.1,
+                "specificHeatCapacity": 1.69,
+                "thermalConductivity": 2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 233,
+                "highTemp": 673,
+                "lowTempTransitionTarget": "SolidCrudeOil",
+                "highTempTransitionTarget": "Petroleum",
+                "defaultTemperature": 350,
+                "defaultMass": 870,
+                "molarMass": 500,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": ["Slippery", "LubricatingOil", "UnrefinedOil"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.CRUDEOIL.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "DirtyWater",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 125,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 4.179,
+                "thermalConductivity": 0.58,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 252.5,
+                "highTemp": 392.5,
+                "lowTempTransitionTarget": "DirtyIce",
+                "highTempTransitionTarget": "Steam",
+                "sublimateId": "ContaminatedOxygen",
+                "sublimateFx": "ContaminatedOxygenBubbleWater",
+                "offGasPercentage": 0.001,
+                "sublimateEfficiency": 1,
+                "sublimateProbability": 0.01,
+                "highTempTransitionOreId": "Dirt",
+                "highTempTransitionOreMassConversion": 0.01,
+                "defaultTemperature": 300,
+                "defaultMass": 1000,
+                "molarMass": 20,
+                "toxicity": 0.1,
+                "lightAbsorptionFactor": 0.7,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": ["Mixture", "AnyWater"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.DIRTYWATER.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidCarbonDioxide",
+                "maxMass": 2000,
+                "liquidCompression": 1.01,
+                "speed": 125,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 0.846,
+                "thermalConductivity": 1.46,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 216.6,
+                "highTemp": 225,
+                "lowTempTransitionTarget": "SolidCarbonDioxide",
+                "highTempTransitionTarget": "CarbonDioxide",
+                "defaultTemperature": 220,
+                "defaultMass": 600,
+                "molarMass": 44.01,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": null,
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDCARBONDIOXIDE.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidGunk",
+                "maxMass": 870,
+                "liquidCompression": 1.01,
+                "speed": 50,
+                "minHorizontalFlow": 0.1,
+                "minVerticalFlow": 0.1,
+                "specificHeatCapacity": 1.2,
+                "thermalConductivity": 1.5,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 265,
+                "highTemp": 721,
+                "lowTempTransitionTarget": "Gunk",
+                "highTempTransitionTarget": "Petroleum",
+                "highTempTransitionOreId": "Sulfur",
+                "highTempTransitionOreMassConversion": 0.08,
+                "defaultTemperature": 310,
+                "defaultMass": 870,
+                "molarMass": 550,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.9,
+                "radiationPer1000Mass": 0,
+                "tags": ["Slippery"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDGUNK.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidHelium",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 0.2,
+                "thermalConductivity": 0.236,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 0,
+                "highTemp": 4.22,
+                "highTempTransitionTarget": "Helium",
+                "defaultTemperature": 1,
+                "defaultMass": 200,
+                "molarMass": 4,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.8,
+                "radiationAbsorptionFactor": 0.89,
+                "radiationPer1000Mass": 0,
+                "tags": null,
+                "isDisabled": true,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDHELIUM.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidHydrogen",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 180,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 2.4,
+                "thermalConductivity": 0.1,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 14,
+                "highTemp": 21,
+                "lowTempTransitionTarget": "SolidHydrogen",
+                "highTempTransitionTarget": "Hydrogen",
+                "defaultTemperature": 18,
+                "defaultMass": 600,
+                "molarMass": 1.00794,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.9,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDHYDROGEN.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidMethane",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 180,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 2.191,
+                "thermalConductivity": 0.03,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 90.55,
+                "highTemp": 111.65,
+                "lowTempTransitionTarget": "SolidMethane",
+                "highTempTransitionTarget": "Methane",
+                "defaultTemperature": 100,
+                "defaultMass": 600,
+                "molarMass": 16.044,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.6,
+                "radiationAbsorptionFactor": 0.75,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDMETHANE.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidOxygen",
+                "maxMass": 500,
+                "liquidCompression": 1.01,
+                "speed": 200,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 1.01,
+                "thermalConductivity": 2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 54.36,
+                "highTemp": 90.19,
+                "lowTempTransitionTarget": "SolidOxygen",
+                "highTempTransitionTarget": "Oxygen",
+                "defaultTemperature": 74.36,
+                "defaultMass": 300,
+                "molarMass": 15.9994,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.82,
+                "radiationPer1000Mass": 0,
+                "tags": ["Oxidizer"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDOXYGEN.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidPhosphorus",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 2,
+                "minVerticalFlow": 1,
+                "specificHeatCapacity": 0.7697,
+                "thermalConductivity": 0.236,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 317.3,
+                "highTemp": 553.6,
+                "lowTempTransitionTarget": "Phosphorus",
+                "highTempTransitionTarget": "PhosphorusGas",
+                "defaultTemperature": 500,
+                "defaultMass": 200,
+                "molarMass": 30.973762,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.75,
+                "radiationPer1000Mass": 0,
+                "tags": ["EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDPHOSPHORUS.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidPropane",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 180,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 2.4,
+                "thermalConductivity": 0.1,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 85,
+                "highTemp": 231,
+                "lowTempTransitionTarget": "SolidPropane",
+                "highTempTransitionTarget": "Propane",
+                "defaultTemperature": 200,
+                "defaultMass": 600,
+                "molarMass": 44.1,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.75,
+                "radiationPer1000Mass": 0,
+                "tags": ["HideFromSpawnTool", "HideFromCodex"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDPROPANE.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "LiquidSulfur",
+                "maxMass": 740,
+                "liquidCompression": 1.01,
+                "speed": 50,
+                "minHorizontalFlow": 0.1,
+                "minVerticalFlow": 0.1,
+                "specificHeatCapacity": 0.7,
+                "thermalConductivity": 0.2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 388.35,
+                "highTemp": 610.15,
+                "lowTempTransitionTarget": "Sulfur",
+                "highTempTransitionTarget": "SulfurGas",
+                "defaultTemperature": 450,
+                "defaultMass": 190,
+                "molarMass": 32,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.1,
+                "radiationAbsorptionFactor": 0.74,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.LIQUIDSULFUR.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "Milk",
+                "maxMass": 1100,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 4.1,
+                "thermalConductivity": 0.609,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 256.65,
+                "highTemp": 353.15,
+                "lowTempTransitionTarget": "MilkIce",
+                "highTempTransitionTarget": "Brine",
+                "highTempTransitionOreId": "MilkFat",
+                "highTempTransitionOreMassConversion": 0.1,
+                "defaultTemperature": 310,
+                "defaultMass": 1100,
+                "molarMass": 23,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.8,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MILK.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "Magma",
+                "maxMass": 1840,
+                "liquidCompression": 1.01,
+                "speed": 60,
+                "minHorizontalFlow": 50,
+                "minVerticalFlow": 20,
+                "specificHeatCapacity": 1,
+                "thermalConductivity": 1,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1683,
+                "highTemp": 2630,
+                "lowTempTransitionTarget": "IgneousRock",
+                "highTempTransitionTarget": "RockGas",
+                "defaultTemperature": 2000,
+                "defaultMass": 1840,
+                "molarMass": 50,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": ["EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MAGMA.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "Mercury",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 140,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 0.14,
+                "thermalConductivity": 8.3,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 234.3,
+                "highTemp": 629.9,
+                "lowTempTransitionTarget": "SolidMercury",
+                "highTempTransitionTarget": "MercuryGas",
+                "defaultTemperature": 320,
+                "defaultMass": 600,
+                "molarMass": 200.59,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.25,
+                "radiationPer1000Mass": 0,
+                "tags": ["RefinedMetal"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MERCURY.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenAluminum",
+                "maxMass": 7870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 30,
+                "minVerticalFlow": 3,
+                "specificHeatCapacity": 0.91,
+                "thermalConductivity": 20.5,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 933.45,
+                "highTemp": 2743.15,
+                "lowTempTransitionTarget": "Aluminum",
+                "highTempTransitionTarget": "AluminumGas",
+                "defaultTemperature": 2000,
+                "defaultMass": 1000,
+                "molarMass": 55.845,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.77,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENALUMINUM.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenCarbon",
+                "maxMass": 4000,
+                "liquidCompression": 1.01,
+                "speed": 150,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 0.71,
+                "thermalConductivity": 2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 3825,
+                "highTemp": 5100,
+                "lowTempTransitionTarget": "RefinedCarbon",
+                "highTempTransitionTarget": "CarbonGas",
+                "defaultTemperature": 4600,
+                "defaultMass": 600,
+                "molarMass": 12.0107,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.84,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENCARBON.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenCopper",
+                "maxMass": 3870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 20,
+                "minVerticalFlow": 2,
+                "specificHeatCapacity": 0.386,
+                "thermalConductivity": 12,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1357,
+                "highTemp": 2834,
+                "lowTempTransitionTarget": "Copper",
+                "highTempTransitionTarget": "CopperGas",
+                "defaultTemperature": 1800,
+                "defaultMass": 900,
+                "molarMass": 63.546,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.61,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENCOPPER.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenGlass",
+                "maxMass": 1840,
+                "liquidCompression": 1.01,
+                "speed": 60,
+                "minHorizontalFlow": 50,
+                "minVerticalFlow": 20,
+                "specificHeatCapacity": 0.2,
+                "thermalConductivity": 1,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1400,
+                "highTemp": 2630,
+                "lowTempTransitionTarget": "Glass",
+                "highTempTransitionTarget": "RockGas",
+                "defaultTemperature": 2215,
+                "defaultMass": 200,
+                "molarMass": 50,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.7,
+                "radiationAbsorptionFactor": 0.65,
+                "radiationPer1000Mass": 0,
+                "tags": ["EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENGLASS.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenGold",
+                "maxMass": 9970,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 25,
+                "minVerticalFlow": 1,
+                "specificHeatCapacity": 0.1291,
+                "thermalConductivity": 6,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1337,
+                "highTemp": 3129,
+                "lowTempTransitionTarget": "Gold",
+                "highTempTransitionTarget": "GoldGas",
+                "defaultTemperature": 2000,
+                "defaultMass": 870,
+                "molarMass": 196.966569,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.35,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENGOLD.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenIron",
+                "maxMass": 7870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 30,
+                "minVerticalFlow": 3,
+                "specificHeatCapacity": 0.449,
+                "thermalConductivity": 4,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1808,
+                "highTemp": 3023,
+                "lowTempTransitionTarget": "Iron",
+                "highTempTransitionTarget": "IronGas",
+                "defaultTemperature": 2500,
+                "defaultMass": 1000,
+                "molarMass": 55.845,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.66,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENIRON.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenCobalt",
+                "maxMass": 7870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 30,
+                "minVerticalFlow": 3,
+                "specificHeatCapacity": 0.42,
+                "thermalConductivity": 4,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1768,
+                "highTemp": 3200,
+                "lowTempTransitionTarget": "Cobalt",
+                "highTempTransitionTarget": "CobaltGas",
+                "defaultTemperature": 2500,
+                "defaultMass": 1000,
+                "molarMass": 58.9,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.63,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENCOBALT.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenLead",
+                "maxMass": 9970,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 25,
+                "minVerticalFlow": 1,
+                "specificHeatCapacity": 0.128,
+                "thermalConductivity": 11,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 600.65,
+                "highTemp": 2022.15,
+                "lowTempTransitionTarget": "Lead",
+                "highTempTransitionTarget": "LeadGas",
+                "defaultTemperature": 2000,
+                "defaultMass": 3000,
+                "molarMass": 196.966569,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.85,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENLEAD.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenNiobium",
+                "maxMass": 3870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 20,
+                "minVerticalFlow": 10,
+                "specificHeatCapacity": 0.265,
+                "thermalConductivity": 54,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 2750,
+                "highTemp": 5017,
+                "lowTempTransitionTarget": "Niobium",
+                "highTempTransitionTarget": "NiobiumGas",
+                "defaultTemperature": 3000,
+                "defaultMass": 900,
+                "molarMass": 92.9,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.49,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENNIOBIUM.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenSalt",
+                "maxMass": 740,
+                "liquidCompression": 1.01,
+                "speed": 50,
+                "minHorizontalFlow": 0.1,
+                "minVerticalFlow": 0.1,
+                "specificHeatCapacity": 0.7,
+                "thermalConductivity": 0.444,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1073,
+                "highTemp": 1738,
+                "lowTempTransitionTarget": "Salt",
+                "highTempTransitionTarget": "SaltGas",
+                "defaultTemperature": 450,
+                "defaultMass": 190,
+                "molarMass": 32,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.1,
+                "radiationAbsorptionFactor": 0.75,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENSALT.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenSteel",
+                "maxMass": 3870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 20,
+                "minVerticalFlow": 10,
+                "specificHeatCapacity": 0.386,
+                "thermalConductivity": 80,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1357,
+                "highTemp": 4100,
+                "lowTempTransitionTarget": "Steel",
+                "highTempTransitionTarget": "SteelGas",
+                "defaultTemperature": 2000,
+                "defaultMass": 900,
+                "molarMass": 63.546,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.74,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENSTEEL.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenTungsten",
+                "maxMass": 3870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 20,
+                "minVerticalFlow": 10,
+                "specificHeatCapacity": 0.134,
+                "thermalConductivity": 4,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 3695,
+                "highTemp": 6203,
+                "lowTempTransitionTarget": "Tungsten",
+                "highTempTransitionTarget": "TungstenGas",
+                "defaultTemperature": 4000,
+                "defaultMass": 200,
+                "molarMass": 183.84,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.7,
+                "radiationAbsorptionFactor": 0.35,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENTUNGSTEN.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenUranium",
+                "maxMass": 9970,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 25,
+                "minVerticalFlow": 1,
+                "specificHeatCapacity": 1.69,
+                "thermalConductivity": 2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 406,
+                "highTemp": 4405,
+                "lowTempTransitionTarget": "DepletedUranium",
+                "highTempTransitionTarget": "RockGas",
+                "defaultTemperature": 460,
+                "defaultMass": 3000,
+                "molarMass": 196.966569,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.3,
+                "radiationPer1000Mass": 150,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENURANIUM.NAME",
+                "dlcId": "EXPANSION1_ID"
+            },
+            {
+                "elementId": "Naphtha",
+                "maxMass": 740,
+                "liquidCompression": 1.01,
+                "speed": 30,
+                "minHorizontalFlow": 10,
+                "minVerticalFlow": 10,
+                "specificHeatCapacity": 2.191,
+                "thermalConductivity": 0.2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 223,
+                "highTemp": 812,
+                "lowTempTransitionTarget": "SolidNaphtha",
+                "highTempTransitionTarget": "SourGas",
+                "defaultTemperature": 350,
+                "defaultMass": 740,
+                "molarMass": 102.2,
+                "toxicity": 0.25,
+                "lightAbsorptionFactor": 0.8,
+                "radiationAbsorptionFactor": 0.6,
+                "radiationPer1000Mass": 0,
+                "tags": ["Oil"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.NAPHTHA.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "NuclearWaste",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 25,
+                "minVerticalFlow": 1,
+                "specificHeatCapacity": 7.44,
+                "thermalConductivity": 6,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 300,
+                "highTemp": 800,
+                "lowTempTransitionTarget": "SolidNuclearWaste",
+                "highTempTransitionTarget": "Fallout",
+                "defaultTemperature": 400,
+                "defaultMass": 500,
+                "molarMass": 196.966569,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.3,
+                "radiationPer1000Mass": 150,
+                "tags": ["EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.NUCLEARWASTE.NAME",
+                "dlcId": "EXPANSION1_ID"
+            },
+            {
+                "elementId": "Petroleum",
+                "maxMass": 740,
+                "liquidCompression": 1.01,
+                "speed": 50,
+                "minHorizontalFlow": 0.1,
+                "minVerticalFlow": 0.1,
+                "specificHeatCapacity": 1.76,
+                "thermalConductivity": 2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 216,
+                "highTemp": 812,
+                "lowTempTransitionTarget": "SolidPetroleum",
+                "highTempTransitionTarget": "SourGas",
+                "defaultTemperature": 300,
+                "defaultMass": 740,
+                "molarMass": 82.2,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.8,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": ["CombustibleLiquid", "PlastifiableLiquid"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.PETROLEUM.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "NaturalResin",
+                "maxMass": 920,
+                "liquidCompression": 1.01,
+                "speed": 1.1,
+                "minHorizontalFlow": 1.1,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 1.11,
+                "thermalConductivity": 0.15,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 293.15,
+                "highTemp": 398.15,
+                "lowTempTransitionTarget": "NaturalSolidResin",
+                "highTempTransitionTarget": "Steam",
+                "highTempTransitionOreId": "RefinedCarbon",
+                "highTempTransitionOreMassConversion": 0.25,
+                "defaultTemperature": 300,
+                "defaultMass": 920,
+                "molarMass": 52.5,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.8,
+                "radiationAbsorptionFactor": 0.75,
+                "radiationPer1000Mass": 0,
+                "tags": ["PlastifiableLiquid"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.NATURALRESIN.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "Resin",
+                "maxMass": 920,
+                "liquidCompression": 1.01,
+                "speed": 1.1,
+                "minHorizontalFlow": 1.1,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 1.11,
+                "thermalConductivity": 0.15,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 293.15,
+                "highTemp": 398.15,
+                "lowTempTransitionTarget": "SolidResin",
+                "highTempTransitionTarget": "Steam",
+                "highTempTransitionOreId": "Isoresin",
+                "highTempTransitionOreMassConversion": 0.25,
+                "defaultTemperature": 300,
+                "defaultMass": 920,
+                "molarMass": 52.5,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.8,
+                "radiationAbsorptionFactor": 0.75,
+                "radiationPer1000Mass": 0,
+                "tags": null,
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.RESIN.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "SaltWater",
+                "maxMass": 1100,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 4.1,
+                "thermalConductivity": 0.609,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 265.65,
+                "highTemp": 372.84,
+                "lowTempTransitionTarget": "Brine",
+                "highTempTransitionTarget": "Steam",
+                "lowTempTransitionOreId": "Ice",
+                "lowTempTransitionOreMassConversion": 0.77,
+                "highTempTransitionOreId": "Salt",
+                "highTempTransitionOreMassConversion": 0.07,
+                "defaultTemperature": 300,
+                "defaultMass": 1100,
+                "molarMass": 21,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.25,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": ["AnyWater"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.SALTWATER.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "SugarWater",
+                "maxMass": 1100,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 4.1,
+                "thermalConductivity": 0.609,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 190.65,
+                "highTemp": 433.15,
+                "lowTempTransitionTarget": "Ice",
+                "highTempTransitionTarget": "Steam",
+                "lowTempTransitionOreId": "Sucrose",
+                "lowTempTransitionOreMassConversion": 0.77,
+                "highTempTransitionOreId": "Sucrose",
+                "highTempTransitionOreMassConversion": 0.77,
+                "defaultTemperature": 233.15,
+                "defaultMass": 1100,
+                "molarMass": 21,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.5,
+                "radiationAbsorptionFactor": 0.9,
+                "radiationPer1000Mass": 0,
+                "tags": ["PlastifiableLiquid"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.SUGARWATER.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "SuperCoolant",
+                "maxMass": 910,
+                "liquidCompression": 1.01,
+                "speed": 150,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 8.44,
+                "thermalConductivity": 9.46,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 2,
+                "highTemp": 710,
+                "lowTempTransitionTarget": "SolidSuperCoolant",
+                "highTempTransitionTarget": "SuperCoolantGas",
+                "defaultTemperature": 238,
+                "defaultMass": 800,
+                "molarMass": 250,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.9,
+                "radiationAbsorptionFactor": 0.6,
+                "radiationPer1000Mass": 0,
+                "tags": null,
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.SUPERCOOLANT.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "ViscoGel",
+                "maxMass": 100,
+                "liquidCompression": 1.01,
+                "speed": 1,
+                "minHorizontalFlow": 10,
+                "minVerticalFlow": 10,
+                "specificHeatCapacity": 1.55,
+                "thermalConductivity": 0.45,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 242.5,
+                "highTemp": 753,
+                "lowTempTransitionTarget": "SolidViscoGel",
+                "highTempTransitionTarget": "Naphtha",
+                "defaultTemperature": 238,
+                "defaultMass": 100,
+                "molarMass": 10,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.1,
+                "radiationAbsorptionFactor": 0.6,
+                "radiationPer1000Mass": 0,
+                "tags": null,
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.VISCOGEL.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "Water",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 125,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 4.179,
+                "thermalConductivity": 0.609,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 272.5,
+                "highTemp": 372.5,
+                "lowTempTransitionTarget": "Ice",
+                "highTempTransitionTarget": "Steam",
+                "convertId": "DirtyWater",
+                "defaultTemperature": 300,
+                "defaultMass": 1000,
+                "molarMass": 18.01528,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.25,
+                "radiationAbsorptionFactor": 0.8,
+                "radiationPer1000Mass": 0,
+                "tags": ["AnyWater"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.WATER.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "Ethanol",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 125,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 2.46,
+                "thermalConductivity": 0.171,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 159.1,
+                "highTemp": 351.5,
+                "lowTempTransitionTarget": "SolidEthanol",
+                "highTempTransitionTarget": "EthanolGas",
+                "defaultTemperature": 300,
+                "defaultMass": 1000,
+                "molarMass": 46.07,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.25,
+                "radiationAbsorptionFactor": 0.7,
+                "radiationPer1000Mass": 0,
+                "tags": ["CombustibleLiquid"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.ETHANOL.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenSyngas",
+                "maxMass": 1000,
+                "liquidCompression": 1.01,
+                "speed": 180,
+                "minHorizontalFlow": 0.01,
+                "minVerticalFlow": 0.01,
+                "specificHeatCapacity": 2.4,
+                "thermalConductivity": 0.1,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 14,
+                "highTemp": 21,
+                "lowTempTransitionTarget": "SolidSyngas",
+                "highTempTransitionTarget": "Syngas",
+                "defaultTemperature": 18,
+                "defaultMass": 600,
+                "molarMass": 1.00794,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.7,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": true,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENSYNGAS.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "PhytoOil",
+                "maxMass": 870,
+                "liquidCompression": 1,
+                "speed": 100,
+                "minHorizontalFlow": 0.1,
+                "minVerticalFlow": 0.1,
+                "specificHeatCapacity": 0.9,
+                "thermalConductivity": 2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 240,
+                "highTemp": 348.15,
+                "lowTempTransitionTarget": "FrozenPhytoOil",
+                "highTempTransitionTarget": "CarbonDioxide",
+                "highTempTransitionOreId": "Algae",
+                "highTempTransitionOreMassConversion": 0.6666,
+                "defaultTemperature": 293,
+                "defaultMass": 800,
+                "molarMass": 450,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.3,
+                "radiationAbsorptionFactor": 0.9,
+                "radiationPer1000Mass": 0,
+                "tags": ["Slippery", "LubricatingOil", "UnrefinedOil"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.PHYTOOIL.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "RefinedLipid",
+                "maxMass": 870,
+                "liquidCompression": 1,
+                "speed": 100,
+                "minHorizontalFlow": 0.1,
+                "minVerticalFlow": 0.1,
+                "specificHeatCapacity": 2.19,
+                "thermalConductivity": 2,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 263.15,
+                "highTemp": 453.15,
+                "lowTempTransitionTarget": "Tallow",
+                "highTempTransitionTarget": "CarbonDioxide",
+                "defaultTemperature": 293,
+                "defaultMass": 800,
+                "molarMass": 450,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.3,
+                "radiationAbsorptionFactor": 0.7,
+                "radiationPer1000Mass": 0,
+                "tags": ["Slippery", "CombustibleLiquid"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.REFINEDLIPID.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenSucrose",
+                "maxMass": 740,
+                "liquidCompression": 1.01,
+                "speed": 50,
+                "minHorizontalFlow": 0.1,
+                "minVerticalFlow": 0.1,
+                "specificHeatCapacity": 1.255,
+                "thermalConductivity": 0.15,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 459,
+                "highTemp": 503.15,
+                "lowTempTransitionTarget": "Sucrose",
+                "highTempTransitionTarget": "CarbonDioxide",
+                "defaultTemperature": 500,
+                "defaultMass": 190,
+                "molarMass": 32,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 0.1,
+                "radiationAbsorptionFactor": 0.7,
+                "radiationPer1000Mass": 0,
+                "tags": [],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENSUCROSE.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenNickel",
+                "maxMass": 7870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 15,
+                "minVerticalFlow": 2,
+                "specificHeatCapacity": 0.44,
+                "thermalConductivity": 30,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 1728,
+                "highTemp": 3003,
+                "lowTempTransitionTarget": "Nickel",
+                "highTempTransitionTarget": "NickelGas",
+                "defaultTemperature": 1800,
+                "defaultMass": 900,
+                "molarMass": 58.69,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.7,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal", "EmitsLight"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENNICKEL.NAME",
+                "dlcId": ""
+            },
+            {
+                "elementId": "MoltenIridium",
+                "maxMass": 3870,
+                "liquidCompression": 1.01,
+                "speed": 100,
+                "minHorizontalFlow": 20,
+                "minVerticalFlow": 10,
+                "specificHeatCapacity": 0.131,
+                "thermalConductivity": 170,
+                "solidSurfaceAreaMultiplier": 1,
+                "liquidSurfaceAreaMultiplier": 25,
+                "gasSurfaceAreaMultiplier": 1,
+                "lowTemp": 2719,
+                "highTemp": 4403,
+                "lowTempTransitionTarget": "Iridium",
+                "highTempTransitionTarget": "IridiumGas",
+                "defaultTemperature": 3500,
+                "defaultMass": 900,
+                "molarMass": 183.84,
+                "toxicity": 0,
+                "lightAbsorptionFactor": 1,
+                "radiationAbsorptionFactor": 0.88,
+                "radiationPer1000Mass": 0,
+                "tags": ["Metal", "RefinedMetal"],
+                "isDisabled": false,
+                "state": "Liquid",
+                "localizationID": "STRINGS.ELEMENTS.MOLTENIRIDIUM.NAME",
+                "dlcId": ""
+            }
+        ];
+        const liquidNames = {
+            "Brine": {"zh": "浓盐水", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B5%93%E7%9B%90%E6%B0%B4.png/24px-%E6%B5%93%E7%9B%90%E6%B0%B4.png?23e011"},
+            "Chlorine": {"zh": "液态氯", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%B0%AF.png/24px-%E6%B6%B2%E6%80%81%E6%B0%AF.png?e9ceef"},
+            "CrudeOil": {"zh": "原油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%8E%9F%E6%B2%B9.png/24px-%E5%8E%9F%E6%B2%B9.png?a0cf2d"},
+            "DirtyWater": {"zh": "污染水", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B1%A1%E6%9F%93%E6%B0%B4.png/24px-%E6%B1%A1%E6%9F%93%E6%B0%B4.png?d0c54d"},
+            "LiquidCarbonDioxide": {"zh": "液态二氧化碳", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E4%BA%8C%E6%B0%A7%E5%8C%96%E7%A2%B3.png/24px-%E6%B6%B2%E6%80%81%E4%BA%8C%E6%B0%A7%E5%8C%96%E7%A2%B3.png?d482cf"},
+            "LiquidGunk": {"zh": "粘渣油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%B2%98%E6%B8%A3%E6%B2%B9.png/24px-%E7%B2%98%E6%B8%A3%E6%B2%B9.png?601144"},
+            "LiquidHelium": {"zh": "液态氦", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%B0%A6.png/24px-%E6%B6%B2%E6%80%81%E6%B0%A6.png?513315"},
+            "LiquidHydrogen": {"zh": "液态氢", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%B0%A2.png/24px-%E6%B6%B2%E6%80%81%E6%B0%A2.png?2a860f"},
+            "LiquidMethane": {"zh": "液态甲烷", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E7%94%B2%E7%83%B7.png/24px-%E6%B6%B2%E6%80%81%E7%94%B2%E7%83%B7.png?c1f736"},
+            "LiquidOxygen": {"zh": "液态氧", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%B0%A7.png/24px-%E6%B6%B2%E6%80%81%E6%B0%A7.png?f5eba2"},
+            "LiquidPhosphorus": {"zh": "液态磷", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E7%A3%B7.png/24px-%E6%B6%B2%E6%80%81%E7%A3%B7.png?f9730f"},
+            "LiquidPropane": {"zh": "液态丙烷", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E4%B8%99%E7%83%B7.png/24px-%E6%B6%B2%E6%80%81%E4%B8%99%E7%83%B7.png?f4523e"},
+            "LiquidSulfur": {"zh": "液态硫", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E7%A1%AB.png/24px-%E6%B6%B2%E6%80%81%E7%A1%AB.png?d33601"},
+            "Milk": {"zh": "咸乳", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%92%B8%E4%B9%B3.png/24px-%E5%92%B8%E4%B9%B3.png?9b9c44"},
+            "Magma": {"zh": "岩浆", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%B2%A9%E6%B5%86.png/24px-%E5%B2%A9%E6%B5%86.png?b31e9e"},
+            "Mercury": {"zh": "汞", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B1%9E.png/24px-%E6%B1%9E.png?b53990"},
+            "MoltenAluminum": {"zh": "熔融铝", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%9D.png/24px-%E7%86%94%E8%9E%8D%E9%93%9D.png?3d6d42"},
+            "MoltenCarbon": {"zh": "熔融碳", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E7%A2%B3.png/24px-%E7%86%94%E8%9E%8D%E7%A2%B3.png?87c80f"},
+            "MoltenCopper": {"zh": "熔融铜", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%9C.png/24px-%E7%86%94%E8%9E%8D%E9%93%9C.png?765927"},
+            "MoltenGlass": {"zh": "熔融玻璃", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E7%8E%BB%E7%92%83.png/24px-%E7%86%94%E8%9E%8D%E7%8E%BB%E7%92%83.png?f32f90"},
+            "MoltenGold": {"zh": "熔融金", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%87%91.png/24px-%E7%86%94%E8%9E%8D%E9%87%91.png?4fe2be"},
+            "MoltenIron": {"zh": "熔融铁", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%81.png/24px-%E7%86%94%E8%9E%8D%E9%93%81.png?3d6d42"},
+            "MoltenCobalt": {"zh": "熔融钴", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%92%B4.png/24px-%E7%86%94%E8%9E%8D%E9%92%B4.png?77ea64"},
+            "MoltenLead": {"zh": "熔融铅", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%85.png/24px-%E7%86%94%E8%9E%8D%E9%93%85.png?4fe2be"},
+            "MoltenNiobium": {"zh": "熔融铌", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%8C.png/24px-%E7%86%94%E8%9E%8D%E9%93%8C.png?e621a4"},
+            "MoltenSalt": {"zh": "熔融盐", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E7%9B%90.png/24px-%E7%86%94%E8%9E%8D%E7%9B%90.png?b87a7f"},
+            "MoltenSteel": {"zh": "熔融钢", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%92%A2.png/24px-%E7%86%94%E8%9E%8D%E9%92%A2.png?19eb97"},
+            "MoltenTungsten": {"zh": "熔融钨", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%92%A8.png/24px-%E7%86%94%E8%9E%8D%E9%92%A8.png?acb222"},
+            "MoltenUranium": {"zh": "熔融铀", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%80.png/24px-%E7%86%94%E8%9E%8D%E9%93%80.png?4abe6d"},
+            "Naphtha": {"zh": "液态石脑油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E7%9F%B3%E8%84%91%E6%B2%B9.png/24px-%E6%B6%B2%E6%80%81%E7%9F%B3%E8%84%91%E6%B2%B9.png?7eab9b"},
+            "NuclearWaste": {"zh": "液态核废料", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%A0%B8%E5%BA%9F%E6%96%99.png/24px-%E6%B6%B2%E6%80%81%E6%A0%B8%E5%BA%9F%E6%96%99.png?937639"},
+            "Petroleum": {"zh": "石油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%9F%B3%E6%B2%B9.png/24px-%E7%9F%B3%E6%B2%B9.png?5d6f84"},
+            "NaturalResin": {"zh": "树脂", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%A0%91%E8%84%82.png/24px-%E6%A0%91%E8%84%82.png?2c3b0b"},
+            "Resin": {"zh": "树液", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%A0%91%E6%B6%B2.png/24px-%E6%A0%91%E6%B6%B2.png?2c3b0b"},
+            "SaltWater": {"zh": "盐水", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%9B%90%E6%B0%B4.png/24px-%E7%9B%90%E6%B0%B4.png?2c636f"},
+            "SugarWater": {"zh": "花蜜", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E8%8A%B1%E8%9C%9C.png/24px-%E8%8A%B1%E8%9C%9C.png?bb9575"},
+            "SuperCoolant": {"zh": "超级冷却剂", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E8%B6%85%E7%BA%A7%E5%86%B7%E5%8D%B4%E5%89%82.png/24px-%E8%B6%85%E7%BA%A7%E5%86%B7%E5%8D%B4%E5%89%82.png?8c4e80"},
+            "ViscoGel": {"zh": "粘性凝胶", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%B2%98%E6%80%A7%E5%87%9D%E8%83%B6%E6%B5%81%E4%BD%93.png/24px-%E7%B2%98%E6%80%A7%E5%87%9D%E8%83%B6%E6%B5%81%E4%BD%93.png?f6f3fa"},
+            "Water": {"zh": "水", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B0%B4.png/24px-%E6%B0%B4.png?26c664"},
+            "Ethanol": {"zh": "乙醇", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E4%B9%99%E9%86%87.png/24px-%E4%B9%99%E9%86%87.png?e81435"},
+            "MoltenSyngas": {"zh": "熔融合成气", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E5%90%88%E6%88%90%E6%B0%94.png/24px-%E7%86%94%E8%9E%8D%E5%90%88%E6%88%90%E6%B0%94.png?7bd88f"},
+            "PhytoOil": {"zh": "植物润滑油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%A4%8D%E7%89%A9%E6%B6%A6%E6%BB%91%E6%B2%B9.png/24px-%E6%A4%8D%E7%89%A9%E6%B6%A6%E6%BB%91%E6%B2%B9.png?8dcf96"},
+            "RefinedLipid": {"zh": "生物柴油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%94%9F%E7%89%A9%E6%9F%B4%E6%B2%B9.png/24px-%E7%94%9F%E7%89%A9%E6%9F%B4%E6%B2%B9.png?2a45af"},
+            "MoltenSucrose": {"zh": "熔融蔗糖", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E8%94%97%E7%B3%96.png/24px-%E7%86%94%E8%9E%8D%E8%94%97%E7%B3%96.png?bb9575"},
+            "MoltenNickel": {"zh": "熔融镍", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%95%8D.png/24px-%E7%86%94%E8%9E%8D%E9%95%8D.png?90d8c4"},
+            "MoltenIridium": {"zh": "熔融铱", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%B1.png/24px-%E7%86%94%E8%9E%8D%E9%93%B1.png?c75299"},
+        };
+        function LiquidData() {
+            const [isDarkTheme, setIsDarkTheme] = React.useState(false);
+            const [sortConfig, setSortConfig] = React.useState({ key: null, direction: null });
+
+            // 排序函数
+            const handleSort = (key) => {
+                let direction;
+
+                if (sortConfig.key !== key) {
+                    direction = 'asc';
+                } else if (sortConfig.direction === 'asc') {
+                    direction = 'desc';
+                } else if (sortConfig.direction === 'desc') {
+                    direction = null;
+                } else {
+                    direction = 'asc';
+                }
+
+                setSortConfig({
+                    key: direction ? key : null,
+                    direction
+                });
+            };
+
+            // 获取排序后的数据
+            const getSortedLiquids = () => {
+                if (!sortConfig.key || !sortConfig.direction) return liquid;
+
+                return [...liquid].sort((a, b) => {
+                    let aValue, bValue;
+
+                    switch (sortConfig.key) {
+                        case 'name':
+                            aValue = liquidNames[a.elementId]?.zh || a.elementId;
+                            bValue = liquidNames[b.elementId]?.zh || b.elementId;
+                            break;
+                        case 'maxMass':
+                            aValue = a.maxMass;
+                            bValue = b.maxMass;
+                            break;
+                        case 'waterGate':
+                            aValue = a.minHorizontalFlow * 4;
+                            bValue = b.minHorizontalFlow * 4;
+                            break;
+                        case 'heatCapacity':
+                            aValue = a.specificHeatCapacity;
+                            bValue = b.specificHeatCapacity;
+                            break;
+                        case 'temperature':
+                            aValue = a.lowTemp; // 使用凝固温度排序
+                            bValue = b.lowTemp;
+                            break;
+                        case 'density':
+                            aValue = a.molarMass;
+                            bValue = b.molarMass;
+                            break;
+                        default:
+                            return 0;
+                    }
+
+                    if (aValue < bValue) {
+                        return sortConfig.direction === 'asc' ? -1 : 1;
+                    }
+                    if (aValue > bValue) {
+                        return sortConfig.direction === 'asc' ? 1 : -1;
+                    }
+                    return 0;
+                });
+            };
+
+            // 获取排序指示器
+            const getSortIndicator = (key) => {
+                if (sortConfig.key !== key || !sortConfig.direction) return '↕';
+                return sortConfig.direction === 'asc' ? '↑' : '↓';
+            };
+
+            const sortedLiquids = getSortedLiquids();
+
+            React.useEffect(() => {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                setIsDarkTheme(mediaQuery.matches);
+
+                const handleChange = (e) => {
+                    setIsDarkTheme(e.matches);
+                };
+
+                mediaQuery.addEventListener('change', handleChange);
+                return () => mediaQuery.removeEventListener('change', handleChange);
+            }, []);
+
+            React.useEffect(() => {
+                document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
+            }, [isDarkTheme]);
+
+            const toggleTheme = () => {
+                setIsDarkTheme(!isDarkTheme);
+            };
+
+            return (
+                <div className="calculator-container">
+                    <div className="header">
+                        <button className="theme-toggle" onClick={toggleTheme} title="切换主题">
+                            {isDarkTheme ? '☀️' : '🌙'}
+                        </button>
+                        <h1>💧 液体详细数据</h1>
+                        <p>缺氧液体属性大全 - 点击表头排序</p>
+                    </div>
+
+                    <div className="content">
+                        <div className="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th
+                                            onClick={() => handleSort('name')}
+                                            style={{cursor: 'pointer', userSelect: 'none'}}>
+                                            液体 {getSortIndicator('name')}
+                                        </th>
+                                        <th
+                                            onClick={() => handleSort('maxMass')}
+                                            style={{cursor: 'pointer', userSelect: 'none'}}>
+                                            质量 {getSortIndicator('maxMass')}
+                                        </th>
+                                        <th
+                                            onClick={() => handleSort('waterGate')}
+                                            style={{cursor: 'pointer', userSelect: 'none'}}>
+                                            水门 {getSortIndicator('waterGate')}
+                                        </th>
+                                        <th
+                                            onClick={() => handleSort('heatCapacity')}
+                                            style={{cursor: 'pointer', userSelect: 'none'}}>
+                                            比热容(T/g/°C) {getSortIndicator('heatCapacity')}
+                                        </th>
+                                        <th
+                                            onClick={() => handleSort('temperature')}
+                                            style={{cursor: 'pointer', userSelect: 'none'}}>
+                                            凝固/蒸发(°C) {getSortIndicator('temperature')}
+                                        </th>
+                                        <th
+                                            onClick={() => handleSort('density')}
+                                            style={{cursor: 'pointer', userSelect: 'none'}}>
+                                            密度(g/mol) {getSortIndicator('density')}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sortedLiquids.map((item, index) => (
+                                        <tr key={index}>
+                                            <td>
+                                                <div className="liquid-with-icon">
+                                                    {liquidNames[item.elementId]?.image && (
+                                                        <img
+                                                            src={liquidNames[item.elementId].image}
+                                                            alt={liquidNames[item.elementId].zh}
+                                                            className="liquid-icon"
+                                                        />
+                                                    )}
+                                                    <span className="liquid-name">
+                                                        {liquidNames[item.elementId]?.zh || item.elementId}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="mass-cell">{item.maxMass}kg</td>
+                                            <td className="mass-cell">
+                                                {(item.minHorizontalFlow * 4) < 1
+                                                    ? Math.round((item.minHorizontalFlow * 4) * 1000)
+                                                    : ((item.minHorizontalFlow * 4).toFixed(1))
+                                                }
+                                                {(item.minHorizontalFlow * 4) < 1 ? 'g' : 'kg'}
+                                            </td>
+                                            <td className="heat-capacity">{item.specificHeatCapacity}</td>
+                                            <td className="temperature-cell">
+                                                {(item.lowTemp - 272.15).toFixed(1)}°C / {(item.highTemp - 272.15).toFixed(1)}°C
+                                            </td>
+                                            <td className="density-cell">
+                                                {item.molarMass.toFixed(5)}g/mol
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<LiquidData />);
+    </script>
+</body>
+</html>
