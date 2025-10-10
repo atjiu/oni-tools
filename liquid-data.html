@@ -1809,7 +1809,7 @@
                                             </td>
                                             <td className="mass-cell">{item.maxMass}kg</td>
                                             <td className="mass-cell">
-                                                {(item.minHorizontalFlow * 4) < 1
+                                                小于{(item.minHorizontalFlow * 4) < 1
                                                     ? Math.round((item.minHorizontalFlow * 4) * 1000)
                                                     : ((item.minHorizontalFlow * 4).toFixed(1))
                                                 }
