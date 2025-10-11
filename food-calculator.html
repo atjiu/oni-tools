@@ -210,6 +210,8 @@
             border-radius: 8px;
             border: 2px solid var(--border-color);
             transition: all 0.3s ease;
+            flex-shrink: 0;
+            min-width: fit-content;
         }
 
         .checkbox-item:hover {
@@ -325,8 +327,13 @@
             }
 
             .checkbox-group {
-                flex-direction: column;
-                gap: 10px;
+                flex-direction: row;
+                gap: 15px;
+                justify-content: flex-start;
+            }
+            .checkbox-item {
+                flex: 0 0 auto;
+                margin-bottom: 0;
             }
 
             .ingredients-grid {
@@ -435,6 +442,12 @@
             display: none;
         }
 
+        .checkbox-group .checkbox-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
         .radio-icon {
             width: 24px;
             height: 24px;
@@ -454,6 +467,110 @@
             }
         }
     </style>
+<style>
+    .person-config-group {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .person-input-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .person-input-item label {
+        font-weight: 500;
+        color: var(--text-secondary);
+        min-width: auto;
+        white-space: nowrap;
+    }
+
+    .person-input-item input {
+        width: 100px;
+    }
+
+    @media (max-width: 768px) {
+        .person-config-group {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .person-input-item {
+            width: 100%;
+        }
+
+        .person-input-item input {
+            width: 120px;
+        }
+    }
+    .food-option-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .food-name {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .food-properties-small {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .food-property {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75em;
+        color: var(--text-muted);
+        line-height: 1.2;
+    }
+
+    .property-label {
+        font-weight: 500;
+    }
+
+    .property-value {
+        color: var(--text-light);
+    }
+
+    /* 只为食物选项添加特殊样式 */
+    .food-radio-item {
+        padding: 10px 15px;
+        min-height: 60px;
+        align-items: flex-start;
+    }
+
+    /* 制作机器选项保持原有样式 */
+    .machine-radio-item {
+        padding: 8px 15px;
+        min-height: auto;
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+        .food-radio-item {
+            padding: 8px 12px;
+            min-height: 55px;
+        }
+
+        .machine-radio-item {
+            padding: 8px 12px;
+        }
+
+        .food-property {
+            font-size: 0.7em;
+        }
+    }
+</style>
 </head>
 <body>
 <div id="root"></div>
@@ -468,63 +585,63 @@
         "熏炉": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%8F%E7%82%89.png/100px-%E7%86%8F%E7%82%89.png?a7b9ec",
     }
     const 食物 = {
-        "米虱": {"能量": 600, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/2/2f/%E7%B1%B3%E8%99%B1.png/51px-%E7%B1%B3%E8%99%B1.png?3ce538"},
-        "肉": {"能量": 1600, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/8/88/%E8%82%89.png/39px-%E8%82%89.png?325f35"},
-        "蘑菇": {"能量": 2400, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/3b/%E8%98%91%E8%8F%87.png/45px-%E8%98%91%E8%8F%87.png?1f1e96"},
-        "毛刺浆果": {"能量": 1600, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/90/%E6%AF%9B%E5%88%BA%E6%B5%86%E6%9E%9C.png/26px-%E6%AF%9B%E5%88%BA%E6%B5%86%E6%9E%9C.png?9db68e"},
-        "海生菜": {"能量": 400, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/9c/%E6%B5%B7%E7%94%9F%E8%8F%9C.png/40px-%E6%B5%B7%E7%94%9F%E8%8F%9C.png?66e23a"},
-        "帕库鱼片": {"能量": 1000, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/b/b0/%E5%B8%95%E5%BA%93%E9%B1%BC%E7%89%87.png/43px-%E5%B8%95%E5%BA%93%E9%B1%BC%E7%89%87.png?eb01af"},
-        "生蟹肉": {"能量": 1000, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/1/19/%E7%94%9F%E8%9F%B9%E8%82%89.png/50px-%E7%94%9F%E8%9F%B9%E8%82%89.png?2e0830"},
-        "植物肉": {"能量": 1200, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/e/ea/%E6%A4%8D%E7%89%A9%E8%82%89.png/52px-%E6%A4%8D%E7%89%A9%E8%82%89.png?f1883e"},
-        "沼浆果冻": {"能量": 1840, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/98/%E6%B2%BC%E6%B5%86%E6%9E%9C%E5%86%BB.png/34px-%E6%B2%BC%E6%B5%86%E6%9E%9C%E5%86%BB.png?349cbf"},
-        "虫果": {"能量": 250, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/e/e5/%E8%99%AB%E6%9E%9C.png/29px-%E8%99%AB%E6%9E%9C.png?98e45d"},
-        "羽叶果薯": {"能量": 4000, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/5/52/%E7%BE%BD%E5%8F%B6%E6%9E%9C%E8%96%AF.png/39px-%E7%BE%BD%E5%8F%B6%E6%9E%9C%E8%96%AF.png?bc16bb"},
-        "刺壳果": {"能量": 800, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/f/f4/%E5%88%BA%E5%A3%B3%E6%9E%9C.png/43px-%E5%88%BA%E5%A3%B3%E6%9E%9C.png?8de429"},
-        "贫瘠虫果": {"能量": 800, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/%E8%B4%AB%E7%98%A0%E8%99%AB%E6%9E%9C.png/33px-%E8%B4%AB%E7%98%A0%E8%99%AB%E6%9E%9C.png?331275"},
-        "颚鱼片": {"能量": 1000, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/8/89/%E9%A2%9A%E9%B1%BC%E7%89%87.png/39px-%E9%A2%9A%E9%B1%BC%E7%89%87.png?683f73"},
-        "汗甜玉米": {"能量": 800, "制作机器": "生食","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/a/ad/%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3.png/52px-%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3.png?e67719"},
+        "米虱": {"能量": 600, "制作机器": "生食", "品质": "恶心[-1]", "腐烂周期": "4","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/2/2f/%E7%B1%B3%E8%99%B1.png/51px-%E7%B1%B3%E8%99%B1.png?3ce538"},
+        "肉": {"能量": 1600, "制作机器": "生食", "品质": "恶心[-1]", "腐烂周期": "8","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/8/88/%E8%82%89.png/39px-%E8%82%89.png?325f35"},
+        "蘑菇": {"能量": 2400, "制作机器": "生食", "品质": "糟糕[0]", "腐烂周期": "8","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/3b/%E8%98%91%E8%8F%87.png/45px-%E8%98%91%E8%8F%87.png?1f1e96"},
+        "毛刺浆果": {"能量": 1600, "制作机器": "生食", "品质": "糟糕[0]", "腐烂周期": "8","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/90/%E6%AF%9B%E5%88%BA%E6%B5%86%E6%9E%9C.png/26px-%E6%AF%9B%E5%88%BA%E6%B5%86%E6%9E%9C.png?9db68e"},
+        "海生菜": {"能量": 400, "制作机器": "生食", "品质": "糟糕[0]", "腐烂周期": "4","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/9c/%E6%B5%B7%E7%94%9F%E8%8F%9C.png/40px-%E6%B5%B7%E7%94%9F%E8%8F%9C.png?66e23a"},
+        "帕库鱼片": {"能量": 1000, "制作机器": "生食", "品质": "标准[+2]", "腐烂周期": "4","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/b/b0/%E5%B8%95%E5%BA%93%E9%B1%BC%E7%89%87.png/43px-%E5%B8%95%E5%BA%93%E9%B1%BC%E7%89%87.png?eb01af"},
+        "生蟹肉": {"能量": 1000, "制作机器": "生食", "品质": "标准[+2]", "腐烂周期": "4","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/1/19/%E7%94%9F%E8%9F%B9%E8%82%89.png/50px-%E7%94%9F%E8%9F%B9%E8%82%89.png?2e0830"},
+        "植物肉": {"能量": 1200, "制作机器": "生食", "品质": "低劣[+1]", "腐烂周期": "4","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/e/ea/%E6%A4%8D%E7%89%A9%E8%82%89.png/52px-%E6%A4%8D%E7%89%A9%E8%82%89.png?f1883e"},
+        "沼浆果冻": {"能量": 1840, "制作机器": "生食", "品质": "糟糕[0]", "腐烂周期": "4","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/98/%E6%B2%BC%E6%B5%86%E6%9E%9C%E5%86%BB.png/34px-%E6%B2%BC%E6%B5%86%E6%9E%9C%E5%86%BB.png?349cbf"},
+        "虫果": {"能量": 250, "制作机器": "生食", "品质": "低劣[+1]", "腐烂周期": "低劣[+1]","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/e/e5/%E8%99%AB%E6%9E%9C.png/29px-%E8%99%AB%E6%9E%9C.png?98e45d"},
+        "羽叶果薯": {"能量": 4000, "制作机器": "生食", "品质": "糟糕[0]", "腐烂周期": "16","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/5/52/%E7%BE%BD%E5%8F%B6%E6%9E%9C%E8%96%AF.png/39px-%E7%BE%BD%E5%8F%B6%E6%9E%9C%E8%96%AF.png?bc16bb"},
+        "刺壳果": {"能量": 800, "制作机器": "生食", "品质": "恶心[-1]", "腐烂周期": "16","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/f/f4/%E5%88%BA%E5%A3%B3%E6%9E%9C.png/43px-%E5%88%BA%E5%A3%B3%E6%9E%9C.png?8de429"},
+        "贫瘠虫果": {"能量": 800, "制作机器": "生食", "品质": "糟糕[0]", "腐烂周期": "8","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/%E8%B4%AB%E7%98%A0%E8%99%AB%E6%9E%9C.png/33px-%E8%B4%AB%E7%98%A0%E8%99%AB%E6%9E%9C.png?331275"},
+        "颚鱼片": {"能量": 1000, "制作机器": "生食", "品质": "良好[+3]", "腐烂周期": "8","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/8/89/%E9%A2%9A%E9%B1%BC%E7%89%87.png/39px-%E9%A2%9A%E9%B1%BC%E7%89%87.png?683f73"},
+        "汗甜玉米": {"能量": 800, "制作机器": "生食", "品质": "恶心[-1]", "腐烂周期": "16","图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/a/ad/%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3.png/52px-%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3.png?e67719"},
 
         // 1 千克生蛋的热量为 1600 千卡
-        "生蛋": {"能量": 1600, "制作机器": "敲蛋桌", "配方": [[{"蛋": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/0/0a/%E7%94%9F%E8%9B%8B.png/52px-%E7%94%9F%E8%9B%8B.png?ebd531"},
+        "生蛋": {"能量": 1600, "制作机器": "敲蛋桌", "品质": "恶心[0]", "腐烂周期": "8", "配方": [[{"蛋": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/0/0a/%E7%94%9F%E8%9B%8B.png/52px-%E7%94%9F%E8%9B%8B.png?ebd531"},
 
-        "软泥膏": {"能量": 800, "制作机器": "食物压制器", "配方": [[{"泥土": 75}], [{"水": 75}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/7/77/%E8%BD%AF%E6%B3%A5%E8%86%8F.png/51px-%E8%BD%AF%E6%B3%A5%E8%86%8F.png?d02ec1"},
-        "米虱糕": {"能量": 1700, "制作机器": "食物压制器", "配方": [[{"米虱": 2}], [{"水": 50}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/7/7f/%E7%B1%B3%E8%99%B1%E7%B3%95.png/51px-%E7%B1%B3%E8%99%B1%E7%B3%95.png?aee3cf"},
-        "豆腐": {"能量": 3600, "制作机器": "食物压制器", "配方": [[{"小吃豆": 6}], [{"水": 50}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/6/61/%E8%B1%86%E8%85%90.png/54px-%E8%B1%86%E8%85%90.png?4bfd8d"},
-        "浆果糕": {"能量": 4000, "制作机器": "食物压制器", "配方": [[{"冰霜麦粒": 5}, {"巨蕨谷粒": 5}], [{"毛刺浆果": 1}, {"刺壳果": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/4/4d/%E6%B5%86%E6%9E%9C%E7%B3%95.png/50px-%E6%B5%86%E6%9E%9C%E7%B3%95.png?99be16"},
-        "干肉饼": {"能量": 2600, "制作机器": "食物压制器", "配方": [[{"肉": 1}], [{"动物油脂": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/e/e3/%E5%B9%B2%E8%82%89%E9%A5%BC.png/53px-%E5%B9%B2%E8%82%89%E9%A5%BC.png?8e1ffd"},
+        "软泥膏": {"能量": 800, "制作机器": "食物压制器", "品质": "恶心[-1]", "腐烂周期": "8", "配方": [[{"泥土": 75}], [{"水": 75}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/7/77/%E8%BD%AF%E6%B3%A5%E8%86%8F.png/51px-%E8%BD%AF%E6%B3%A5%E8%86%8F.png?d02ec1"},
+        "米虱糕": {"能量": 1700, "制作机器": "食物压制器", "品质": "糟糕[0]", "腐烂周期": "8", "配方": [[{"米虱": 2}], [{"水": 50}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/7/7f/%E7%B1%B3%E8%99%B1%E7%B3%95.png/51px-%E7%B1%B3%E8%99%B1%E7%B3%95.png?aee3cf"},
+        "豆腐": {"能量": 3600, "制作机器": "食物压制器", "品质": "标准[+2]", "腐烂周期": "4", "配方": [[{"小吃豆": 6}], [{"水": 50}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/6/61/%E8%B1%86%E8%85%90.png/54px-%E8%B1%86%E8%85%90.png?4bfd8d"},
+        "浆果糕": {"能量": 4000, "制作机器": "食物压制器", "品质": "良好[+3]", "腐烂周期": "不会腐烂", "配方": [[{"冰霜麦粒": 5}, {"巨蕨谷粒": 5}], [{"毛刺浆果": 1}, {"刺壳果": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/4/4d/%E6%B5%86%E6%9E%9C%E7%B3%95.png/50px-%E6%B5%86%E6%9E%9C%E7%B3%95.png?99be16"},
+        "干肉饼": {"能量": 2600, "制作机器": "食物压制器", "品质": "标准[+2]", "腐烂周期": "不会腐烂", "配方": [[{"肉": 1}], [{"动物油脂": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/e/e3/%E5%B9%B2%E8%82%89%E9%A5%BC.png/53px-%E5%B9%B2%E8%82%89%E9%A5%BC.png?8e1ffd"},
 
-        "腌制米虱": {"能量": 1800, "制作机器": "电动烤炉", "配方": [[{"米虱": 3}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/2/25/%E8%85%8C%E5%88%B6%E7%B1%B3%E8%99%B1.png/30px-%E8%85%8C%E5%88%B6%E7%B1%B3%E8%99%B1.png?dae7a2"},
-        "煎泥膏": {"能量": 1050, "制作机器": "电动烤炉", "配方": [[{"软泥膏": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/f/fc/%E7%85%8E%E6%B3%A5%E8%86%8F.png/51px-%E7%85%8E%E6%B3%A5%E8%86%8F.png?f4724a"},
-        "炙烤刺果": {"能量": 2000, "制作机器": "电动烤炉", "配方": [[{"毛刺浆果": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c6/%E7%82%99%E7%83%A4%E5%88%BA%E6%9E%9C.png/29px-%E7%82%99%E7%83%A4%E5%88%BA%E6%9E%9C.png?ae2a61"},
-        "煎蘑菇": {"能量": 2800, "制作机器": "电动烤炉", "配方": [[{"蘑菇": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/8/87/%E7%85%8E%E8%98%91%E8%8F%87.png/43px-%E7%85%8E%E8%98%91%E8%8F%87.png?eb09c3"},
-        "冰霜面包": {"能量": 1200, "制作机器": "电动烤炉", "配方": [[{"冰霜麦粒": 3}, {"巨蕨谷粒": 3}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/9c/%E5%86%B0%E9%9C%9C%E9%9D%A2%E5%8C%85.png/34px-%E5%86%B0%E9%9C%9C%E9%9D%A2%E5%8C%85.png?c9f9ba"},
-        "煎蛋卷": {"能量": 2800, "制作机器": "电动烤炉", "配方": [[{"生蛋": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/f/fc/%E7%85%8E%E8%9B%8B%E5%8D%B7.png/57px-%E7%85%8E%E8%9B%8B%E5%8D%B7.png?66dbf7"},
-        "烤肉串": {"能量": 4000, "制作机器": "电动烤炉", "配方": [[{"肉": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c2/%E7%83%A4%E8%82%89%E4%B8%B2.png/52px-%E7%83%A4%E8%82%89%E4%B8%B2.png?ab20e6"},
-        "烤海鲜": {"能量": 1600, "制作机器": "电动烤炉", "配方": [[{"帕库鱼片": 1}, {"生蟹肉": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/3b/%E7%83%A4%E6%B5%B7%E9%B2%9C.png/70px-%E7%83%A4%E6%B5%B7%E9%B2%9C.png?f2bf33"},
-        "蛋奶酥煎饼": {"能量": 3600, "制作机器": "电动烤炉", "配方": [[{"生蛋": 1}], [{"冰霜麦粒": 2}, {"巨蕨谷粒": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/5/59/%E8%9B%8B%E5%A5%B6%E9%85%A5%E7%85%8E%E9%A5%BC.png/32px-%E8%9B%8B%E5%A5%B6%E9%85%A5%E7%85%8E%E9%A5%BC.png?d1fe85"},
-        "沼泽欢愉": {"能量": 2240, "制作机器": "电动烤炉", "配方": [[{"沼浆果冻": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/33/%E6%B2%BC%E6%B3%BD%E6%AC%A2%E6%84%89.png/39px-%E6%B2%BC%E6%B3%BD%E6%AC%A2%E6%84%89.png?99204f"},
-        "烤虫果仁": {"能量": 1200, "制作机器": "电动烤炉", "配方": [[{"贫瘠虫果": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/8/82/%E7%83%A4%E8%99%AB%E6%9E%9C%E4%BB%81.png/41px-%E7%83%A4%E8%99%AB%E6%9E%9C%E4%BB%81.png?f13738"},
-        "虫果果酱": {"能量": 2400, "制作机器": "电动烤炉", "配方": [[{"虫果": 8}], [{"蔗糖": 4}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/a/a4/%E8%99%AB%E6%9E%9C%E6%9E%9C%E9%85%B1.png/28px-%E8%99%AB%E6%9E%9C%E6%9E%9C%E9%85%B1.png?a682e2"},
-        "刺壳果烤串": {"能量": 1200, "制作机器": "电动烤炉", "配方": [[{"刺壳果": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/7/77/%E5%88%BA%E5%A3%B3%E6%9E%9C%E7%83%A4%E4%B8%B2.png/38px-%E5%88%BA%E5%A3%B3%E6%9E%9C%E7%83%A4%E4%B8%B2.png?df4acb"},
+        "腌制米虱": {"能量": 1800, "制作机器": "电动烤炉", "品质": "恶心[-1]", "腐烂周期": "32", "配方": [[{"米虱": 3}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/2/25/%E8%85%8C%E5%88%B6%E7%B1%B3%E8%99%B1.png/30px-%E8%85%8C%E5%88%B6%E7%B1%B3%E8%99%B1.png?dae7a2"},
+        "煎泥膏": {"能量": 1050, "制作机器": "电动烤炉", "品质": "糟糕[0]", "腐烂周期": "8", "配方": [[{"软泥膏": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/f/fc/%E7%85%8E%E6%B3%A5%E8%86%8F.png/51px-%E7%85%8E%E6%B3%A5%E8%86%8F.png?f4724a"},
+        "炙烤刺果": {"能量": 2000, "制作机器": "电动烤炉", "品质": "低劣[+1]", "腐烂周期": "8", "配方": [[{"毛刺浆果": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c6/%E7%82%99%E7%83%A4%E5%88%BA%E6%9E%9C.png/29px-%E7%82%99%E7%83%A4%E5%88%BA%E6%9E%9C.png?ae2a61"},
+        "煎蘑菇": {"能量": 2800, "制作机器": "电动烤炉", "品质": "低劣[+1]", "腐烂周期": "8", "配方": [[{"蘑菇": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/8/87/%E7%85%8E%E8%98%91%E8%8F%87.png/43px-%E7%85%8E%E8%98%91%E8%8F%87.png?eb09c3"},
+        "冰霜面包": {"能量": 1200, "制作机器": "电动烤炉", "品质": "标准[+2]", "腐烂周期": "8", "配方": [[{"冰霜麦粒": 3}, {"巨蕨谷粒": 3}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/9c/%E5%86%B0%E9%9C%9C%E9%9D%A2%E5%8C%85.png/34px-%E5%86%B0%E9%9C%9C%E9%9D%A2%E5%8C%85.png?c9f9ba"},
+        "煎蛋卷": {"能量": 2800, "制作机器": "电动烤炉", "品质": "标准[+2]", "腐烂周期": "4", "配方": [[{"生蛋": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/f/fc/%E7%85%8E%E8%9B%8B%E5%8D%B7.png/57px-%E7%85%8E%E8%9B%8B%E5%8D%B7.png?66dbf7"},
+        "烤肉串": {"能量": 4000, "制作机器": "电动烤炉", "品质": "良好[+3]", "腐烂周期": "4", "配方": [[{"肉": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c2/%E7%83%A4%E8%82%89%E4%B8%B2.png/52px-%E7%83%A4%E8%82%89%E4%B8%B2.png?ab20e6"},
+        "烤海鲜": {"能量": 1600, "制作机器": "电动烤炉", "品质": "良好[+3]", "腐烂周期": "4", "配方": [[{"帕库鱼片": 1}, {"生蟹肉": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/3b/%E7%83%A4%E6%B5%B7%E9%B2%9C.png/70px-%E7%83%A4%E6%B5%B7%E9%B2%9C.png?f2bf33"},
+        "蛋奶酥煎饼": {"能量": 3600, "制作机器": "电动烤炉", "品质": "良好[+3]", "腐烂周期": "8", "配方": [[{"生蛋": 1}], [{"冰霜麦粒": 2}, {"巨蕨谷粒": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/5/59/%E8%9B%8B%E5%A5%B6%E9%85%A5%E7%85%8E%E9%A5%BC.png/32px-%E8%9B%8B%E5%A5%B6%E9%85%A5%E7%85%8E%E9%A5%BC.png?d1fe85"},
+        "沼泽欢愉": {"能量": 2240, "制作机器": "电动烤炉", "品质": "低劣[+1]", "腐烂周期": "8", "配方": [[{"沼浆果冻": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/33/%E6%B2%BC%E6%B3%BD%E6%AC%A2%E6%84%89.png/39px-%E6%B2%BC%E6%B3%BD%E6%AC%A2%E6%84%89.png?99204f"},
+        "烤虫果仁": {"能量": 1200, "制作机器": "电动烤炉", "品质": "低劣[+1]", "腐烂周期": "8", "配方": [[{"贫瘠虫果": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/8/82/%E7%83%A4%E8%99%AB%E6%9E%9C%E4%BB%81.png/41px-%E7%83%A4%E8%99%AB%E6%9E%9C%E4%BB%81.png?f13738"},
+        "虫果果酱": {"能量": 2400, "制作机器": "电动烤炉", "品质": "良好[+3]", "腐烂周期": "32", "配方": [[{"虫果": 8}], [{"蔗糖": 4}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/a/a4/%E8%99%AB%E6%9E%9C%E6%9E%9C%E9%85%B1.png/28px-%E8%99%AB%E6%9E%9C%E6%9E%9C%E9%85%B1.png?a682e2"},
+        "刺壳果烤串": {"能量": 1200, "制作机器": "电动烤炉", "品质": "低劣[+1]", "腐烂周期": "8", "配方": [[{"刺壳果": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/7/77/%E5%88%BA%E5%A3%B3%E6%9E%9C%E7%83%A4%E4%B8%B2.png/38px-%E5%88%BA%E5%A3%B3%E6%9E%9C%E7%83%A4%E4%B8%B2.png?df4acb"},
 
-        "浆果酿": {"能量": 4400, "制作机器": "燃气灶", "配方": [[{"炙烤刺果": 2}], [{"火椒粒": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/a/a6/%E6%B5%86%E6%9E%9C%E9%85%BF.png/30px-%E6%B5%86%E6%9E%9C%E9%85%BF.png?630894"},
-        "蘑菇卷": {"能量": 4800, "制作机器": "燃气灶", "配方": [[{"煎蘑菇": 1}], [{"海生菜": 4}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/5/5b/%E8%98%91%E8%8F%87%E5%8D%B7.png/46px-%E8%98%91%E8%8F%87%E5%8D%B7.png?b0bc44"},
-        "海陆双拼": {"能量": 6000, "制作机器": "燃气灶", "配方": [[{"烤肉串": 1}], [{"烤海鲜": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/7/76/%E6%B5%B7%E9%99%86%E5%8F%8C%E6%8B%BC.png/33px-%E6%B5%B7%E9%99%86%E5%8F%8C%E6%8B%BC.png?250f99"},
-        "火椒面包": {"能量": 4000, "制作机器": "燃气灶", "配方": [[{"冰霜麦粒": 10}, {"巨蕨谷粒": 10}], [{"火椒粒": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/a/a3/%E7%81%AB%E6%A4%92%E9%9D%A2%E5%8C%85.png/47px-%E7%81%AB%E6%A4%92%E9%9D%A2%E5%8C%85.png?715a1f"},
-        "麻婆豆腐": {"能量": 4000, "制作机器": "燃气灶", "配方": [[{"豆腐": 1}], [{"火椒粒": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/f/fb/%E9%BA%BB%E5%A9%86%E8%B1%86%E8%85%90.png/46px-%E9%BA%BB%E5%A9%86%E8%B1%86%E8%85%90.png?32f3df"},
-        "蘑菇乳蛋饼": {"能量": 6400, "制作机器": "燃气灶", "配方": [[{"煎蛋卷": 1}], [{"海生菜": 1}], [{"煎蘑菇": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/6/6f/%E8%98%91%E8%8F%87%E4%B9%B3%E8%9B%8B%E9%A5%BC.png/42px-%E8%98%91%E8%8F%87%E4%B9%B3%E8%9B%8B%E9%A5%BC.png?649a86"},
-        "冰霜汉堡": {"能量": 6000, "制作机器": "燃气灶", "配方": [[{"冰霜面包": 1}], [{"海生菜": 1}], [{"烤肉串": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/d/da/%E5%86%B0%E9%9C%9C%E6%B1%89%E5%A0%A1.png/38px-%E5%86%B0%E9%9C%9C%E6%B1%89%E5%A0%A1.png?f73b17"},
-        "咖喱豆": {"能量": 5000, "制作机器": "燃气灶", "配方": [[{"滋补根": 4}], [{"小吃豆": 4}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/36/%E5%92%96%E5%96%B1%E8%B1%86.png/55px-%E5%92%96%E5%96%B1%E8%B1%86.png?1d90d5"},
-        "混合浆果派": {"能量": 4200, "制作机器": "燃气灶", "配方": [[{"冰霜麦粒": 3}, {"巨蕨谷粒": 3}], [{"虫果": 4}], [{"炙烤刺果": 1}, {"刺壳果烤串": 1.6667}, {"漫花果": 6.153}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/34/%E6%B7%B7%E5%90%88%E6%B5%86%E6%9E%9C%E6%B4%BE.png/42px-%E6%B7%B7%E5%90%88%E6%B5%86%E6%9E%9C%E6%B4%BE.png?9cdc2c"},
+        "浆果酿": {"能量": 4400, "制作机器": "燃气灶", "品质": "优秀[+4]", "腐烂周期": "4", "配方": [[{"炙烤刺果": 2}], [{"火椒粒": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/a/a6/%E6%B5%86%E6%9E%9C%E9%85%BF.png/30px-%E6%B5%86%E6%9E%9C%E9%85%BF.png?630894"},
+        "蘑菇卷": {"能量": 4800, "制作机器": "燃气灶", "品质": "优秀[+4]", "腐烂周期": "4", "配方": [[{"煎蘑菇": 1}], [{"海生菜": 4}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/5/5b/%E8%98%91%E8%8F%87%E5%8D%B7.png/46px-%E8%98%91%E8%8F%87%E5%8D%B7.png?b0bc44"},
+        "海陆双拼": {"能量": 6000, "制作机器": "燃气灶", "品质": "优秀[+4]", "腐烂周期": "4", "配方": [[{"烤肉串": 1}], [{"烤海鲜": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/7/76/%E6%B5%B7%E9%99%86%E5%8F%8C%E6%8B%BC.png/33px-%E6%B5%B7%E9%99%86%E5%8F%8C%E6%8B%BC.png?250f99"},
+        "火椒面包": {"能量": 4000, "制作机器": "燃气灶", "品质": "杰出[+5]", "腐烂周期": "8", "配方": [[{"冰霜麦粒": 10}, {"巨蕨谷粒": 10}], [{"火椒粒": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/a/a3/%E7%81%AB%E6%A4%92%E9%9D%A2%E5%8C%85.png/47px-%E7%81%AB%E6%A4%92%E9%9D%A2%E5%8C%85.png?715a1f"},
+        "麻婆豆腐": {"能量": 4000, "制作机器": "燃气灶", "品质": "杰出[+5]", "腐烂周期": "4", "配方": [[{"豆腐": 1}], [{"火椒粒": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/f/fb/%E9%BA%BB%E5%A9%86%E8%B1%86%E8%85%90.png/46px-%E9%BA%BB%E5%A9%86%E8%B1%86%E8%85%90.png?32f3df"},
+        "蘑菇乳蛋饼": {"能量": 6400, "制作机器": "燃气灶", "品质": "杰出[+5]", "腐烂周期": "4", "配方": [[{"煎蛋卷": 1}], [{"海生菜": 1}], [{"煎蘑菇": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/6/6f/%E8%98%91%E8%8F%87%E4%B9%B3%E8%9B%8B%E9%A5%BC.png/42px-%E8%98%91%E8%8F%87%E4%B9%B3%E8%9B%8B%E9%A5%BC.png?649a86"},
+        "冰霜汉堡": {"能量": 6000, "制作机器": "燃气灶", "品质": "极佳[+6]", "腐烂周期": "4", "配方": [[{"冰霜面包": 1}], [{"海生菜": 1}], [{"烤肉串": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/d/da/%E5%86%B0%E9%9C%9C%E6%B1%89%E5%A0%A1.png/38px-%E5%86%B0%E9%9C%9C%E6%B1%89%E5%A0%A1.png?f73b17"},
+        "咖喱豆": {"能量": 5000, "制作机器": "燃气灶", "品质": "优秀[+4]", "腐烂周期": "16", "配方": [[{"滋补根": 4}], [{"小吃豆": 4}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/36/%E5%92%96%E5%96%B1%E8%B1%86.png/55px-%E5%92%96%E5%96%B1%E8%B1%86.png?1d90d5"},
+        "混合浆果派": {"能量": 4200, "制作机器": "燃气灶", "品质": "杰出[+5]", "腐烂周期": "4", "配方": [[{"冰霜麦粒": 3}, {"巨蕨谷粒": 3}], [{"虫果": 4}], [{"炙烤刺果": 1}, {"刺壳果烤串": 1.6667}, {"漫花果": 6.153}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/3/34/%E6%B7%B7%E5%90%88%E6%B5%86%E6%9E%9C%E6%B4%BE.png/42px-%E6%B7%B7%E5%90%88%E6%B5%86%E6%9E%9C%E6%B4%BE.png?9cdc2c"},
 
-        "果薯条": {"能量": 5400, "制作机器": "油炸锅", "配方": [[{"羽叶果薯": 1}], [{"动物油脂": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/90/%E6%9E%9C%E8%96%AF%E6%9D%A1.png/25px-%E6%9E%9C%E8%96%AF%E6%9D%A1.png?3000f2"},
-        "炸豆小吃": {"能量": 5000, "制作机器": "油炸锅", "配方": [[{"小吃豆": 6}], [{"动物油脂": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/b/b0/%E7%82%B8%E8%B1%86%E5%B0%8F%E5%90%83.png/48px-%E7%82%B8%E8%B1%86%E5%B0%8F%E5%90%83.png?320292"},
-        "鱼肉卷": {"能量": 4200, "制作机器": "油炸锅", "配方": [[{"帕库鱼片": 1}], [{"动物油脂": 2.4}], [{"冰霜面包": 2}], [{"巨蕨谷粒": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/2/29/%E9%B1%BC%E8%82%89%E5%8D%B7.png/40px-%E9%B1%BC%E8%82%89%E5%8D%B7.png?78690c"},
-        "蟹肉天妇罗": {"能量": 4200, "制作机器": "油炸锅", "配方": [[{"生蟹肉": 1}], [{"动物油脂": 2.4}], [{"冰霜面包": 2}], [{"巨蕨谷粒": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c7/%E8%9F%B9%E8%82%89%E5%A4%A9%E5%A6%87%E7%BD%97.png/28px-%E8%9F%B9%E8%82%89%E5%A4%A9%E5%A6%87%E7%BD%97.png?837b10"},
+        "果薯条": {"能量": 5400, "制作机器": "油炸锅", "品质": "良好[+3]", "腐烂周期": "4", "配方": [[{"羽叶果薯": 1}], [{"动物油脂": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/90/%E6%9E%9C%E8%96%AF%E6%9D%A1.png/25px-%E6%9E%9C%E8%96%AF%E6%9D%A1.png?3000f2"},
+        "炸豆小吃": {"能量": 5000, "制作机器": "油炸锅", "品质": "良好[+3]", "腐烂周期": "8", "配方": [[{"小吃豆": 6}], [{"动物油脂": 1}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/b/b0/%E7%82%B8%E8%B1%86%E5%B0%8F%E5%90%83.png/48px-%E7%82%B8%E8%B1%86%E5%B0%8F%E5%90%83.png?320292"},
+        "鱼肉卷": {"能量": 4200, "制作机器": "油炸锅", "品质": "优秀[+4]", "腐烂周期": "4", "配方": [[{"帕库鱼片": 1}], [{"动物油脂": 2.4}], [{"冰霜面包": 2}], [{"巨蕨谷粒": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/2/29/%E9%B1%BC%E8%82%89%E5%8D%B7.png/40px-%E9%B1%BC%E8%82%89%E5%8D%B7.png?78690c"},
+        "蟹肉天妇罗": {"能量": 4200, "制作机器": "油炸锅", "品质": "优秀[+4]", "腐烂周期": "4", "配方": [[{"生蟹肉": 1}], [{"动物油脂": 2.4}], [{"冰霜面包": 2}], [{"巨蕨谷粒": 2}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c7/%E8%9F%B9%E8%82%89%E5%A4%A9%E5%A6%87%E7%BD%97.png/28px-%E8%9F%B9%E8%82%89%E5%A4%A9%E5%A6%87%E7%BD%97.png?837b10"},
 
-        "嫩肋排": {"能量": 16000, "制作机器": "熏炉", "配方": [[{"硬肉": 6}], [{"木材": 100}, {"泥炭": 100}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/1/1c/%E5%AB%A9%E8%82%8B%E6%8E%92.png/43px-%E5%AB%A9%E8%82%8B%E6%8E%92.png?1b30f6"},
-        "熏鱼": {"能量": 4200, "制作机器": "熏炉", "配方": [[{"帕库鱼片": 6}, {"颚鱼片": 6}], [{"木材": 100}, {"泥炭": 100}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/95/%E7%86%8F%E9%B1%BC.png/58px-%E7%86%8F%E9%B1%BC.png?6c6dd5"},
-        "爆米花": {"能量": 2862.5, "制作机器": "熏炉", "产量":4 ,"配方": [[{"汗甜玉米": 7}, {"刺壳果": 7}, {"贫瘠虫果": 7}], [{"木材": 100}, {"泥炭": 100}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/d/d8/%E7%88%86%E7%B1%B3%E8%8A%B1.png/41px-%E7%88%86%E7%B1%B3%E8%8A%B1.png?f7fa09"},
+        "嫩肋排": {"能量": 16000, "制作机器": "熏炉", "品质": "良好[+3]", "腐烂周期": "8", "配方": [[{"硬肉": 6}], [{"木材": 100}, {"泥炭": 100}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/1/1c/%E5%AB%A9%E8%82%8B%E6%8E%92.png/43px-%E5%AB%A9%E8%82%8B%E6%8E%92.png?1b30f6"},
+        "熏鱼": {"能量": 4200, "制作机器": "熏炉", "品质": "良好[+3]", "腐烂周期": "32", "配方": [[{"帕库鱼片": 6}, {"颚鱼片": 6}], [{"木材": 100}, {"泥炭": 100}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/9/95/%E7%86%8F%E9%B1%BC.png/58px-%E7%86%8F%E9%B1%BC.png?6c6dd5"},
+        "爆米花": {"能量": 2862.5, "制作机器": "熏炉", "品质": "标准[+2]", "腐烂周期": "16", "产量":4 ,"配方": [[{"汗甜玉米": 7}, {"刺壳果": 7}, {"贫瘠虫果": 7}], [{"木材": 100}, {"泥炭": 100}]],"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/d/d8/%E7%88%86%E7%B1%B3%E8%8A%B1.png/41px-%E7%88%86%E7%B1%B3%E8%8A%B1.png?f7fa09"},
     };
     const 植物 = {
         "米虱木": {"生长周期": [3,12], "人工培育": {"施肥": {"泥土":[10,0]}}, "米虱": {"数量": 1, "能量": 600},"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%B1%B3%E8%99%B1%E6%9C%A8.png/50px-%E7%B1%B3%E8%99%B1%E6%9C%A8.png?3597c5"},
@@ -804,26 +921,28 @@
                 <div className="content">
                     <div className="section">
                         <div className="section-title">👥 复制人配置</div>
-                        <div className="input-group">
-                            <label>复制人数量:</label>
-                            <input
-                                type="number"
-                                step="1"
-                                min="1"
-                                value={personNumber}
-                                onChange={e => setPersonNumber(parseInt(e.target.value) || 12)}
-                            />
-                        </div>
-                        <div className="input-group">
-                            <label>无底洞之胃:</label>
-                            <input
-                                type="number"
-                                step="1"
-                                min="0"
-                                max={personNumber}
-                                value={bigPersonNumber}
-                                onChange={e => setBigPersonNumber(parseInt(e.target.value) || 0)}
-                            />
+                        <div className="person-config-group">
+                            <div className="person-input-item">
+                                <label>复制人数量:</label>
+                                <input
+                                    type="number"
+                                    step="1"
+                                    min="1"
+                                    value={personNumber}
+                                    onChange={e => setPersonNumber(parseInt(e.target.value) || 12)}
+                                />
+                            </div>
+                            <div className="person-input-item">
+                                <label>无底洞之胃:</label>
+                                <input
+                                    type="number"
+                                    step="1"
+                                    min="0"
+                                    max={personNumber}
+                                    value={bigPersonNumber}
+                                    onChange={e => setBigPersonNumber(parseInt(e.target.value) || 0)}
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -894,7 +1013,7 @@
                             <div>制作机器:</div>
                             <div className="radio-group">
                                 {[...new Set(Object.values(食物).map(食物信息 => 食物信息["制作机器"]))].map(机器 => (
-                                    <label key={机器} className="radio-item">
+                                    <label key={机器} className="radio-item machine-radio-item">
                                         <input
                                             type="radio"
                                             name="foodMachine"
@@ -918,7 +1037,7 @@
                                     {Object.entries(食物)
                                         .filter(([食物名称, 食物信息]) => 食物信息["制作机器"] === foodMachine)
                                         .map(([食物名称, 食物信息]) => (
-                                            <label key={食物名称} className="radio-item">
+                                            <label key={食物名称} className="radio-item food-radio-item">
                                                 <input
                                                     type="radio"
                                                     name="food"
@@ -929,7 +1048,23 @@
                                                 {食物信息.图片 && (
                                                     <img src={食物信息.图片} alt={食物名称} className="radio-icon" />
                                                 )}
-                                                <span>{食物名称}</span>
+                                                <div className="food-option-content">
+                                                    <div className="food-name">{食物名称}</div>
+                                                    <div className="food-properties-small">
+                                                        {食物信息["品质"] && (
+                                                            <div className="food-property">
+                                                                <span className="property-label">品质:</span>
+                                                                <span className="property-value">{食物信息["品质"]}</span>
+                                                            </div>
+                                                        )}
+                                                        {食物信息["腐烂周期"] && (
+                                                            <div className="food-property">
+                                                                <span className="property-label">腐烂:</span>
+                                                                <span className="property-value">{食物信息["腐烂周期"]!="不会腐烂"?食物信息["腐烂周期"]+"周期":食物信息["腐烂周期"]}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </label>
                                         ))}
                                 </div>
