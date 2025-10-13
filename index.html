@@ -249,6 +249,9 @@
         .tool-card:nth-child(1) { animation-delay: 0.1s; }
         .tool-card:nth-child(2) { animation-delay: 0.2s; }
         .tool-card:nth-child(3) { animation-delay: 0.3s; }
+        .tool-card:nth-child(4) { animation-delay: 0.4s; }
+        .tool-card:nth-child(5) { animation-delay: 0.5s; }
+        .tool-card:nth-child(6) { animation-delay: 0.6s; }
     </style>
 </head>
 <body>
@@ -300,6 +303,19 @@
                 <button class="tool-button">开始计算</button>
             </div>
 
+            <div class="tool-card" onclick="navigateTo('critter-calculator.html')">
+                <span class="tool-icon">🐾</span>
+                <h2 class="tool-title">小动物养殖计算器</h2>
+                <p class="tool-description">计算小动物食物需求和产出，优化养殖系统</p>
+                <ul class="tool-features">
+                    <li>支持所有小动物类型</li>
+                    <li>计算食物消耗量</li>
+                    <li>分析资源产出</li>
+                    <li>优化养殖规模</li>
+                </ul>
+                <button class="tool-button">开始计算</button>
+            </div>
+
             <div class="tool-card" onclick="navigateTo('liquid-data.html')">
                 <span class="tool-icon">💧</span>
                 <h2 class="tool-title">液体数据表</h2>
@@ -347,7 +363,10 @@
 
         // 页面跳转
         function navigateTo(url) {
-            if (url == "food-calculator.html"||url == "rocket-calculator.html"||url=="liquid-data.html") {
+            if (url === "food-calculator.html" ||
+                url === "critter-calculator.html" ||
+                url === "rocket-calculator.html" ||
+                url === "liquid-data.html") {
                 window.location.href = url;
             } else {
                 alert("尽请期待~");
