@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>缺氧间歇泉计算器</title>
+    <!-- <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script> -->
+    <script src="./css/react-development-18.3.1.js"></script>
+    <script src="./css/react-dom-development-18.3.1.js"></script>
+    <script src="./css/babel-min-7.28.4.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%); --bg-secondary: white; --bg-tertiary: #f8f9fa; --bg-card: white; --text-primary: #2c3e50; --text-secondary: #34495e; --text-muted: #7f8c8d; --text-light: #95a5a6; --border-color: #e1e8ed; --border-light: #ecf0f1; --accent-primary: #3498db; --accent-secondary: #e74c3c; --accent-success: #27ae60; --shadow: 0 10px 30px rgba(0, 0, 0, 0.3); --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.1); }
+        [data-theme="dark"] { --bg-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); --bg-secondary: #1a1a1a; --bg-tertiary: #2d2d2d; --bg-card: #2d2d2d; --text-primary: #ffffff; --text-secondary: #e0e0e0; --text-muted: #b0b0b0; --text-light: #888888; --border-color: #404040; --border-light: #505050; --accent-primary: #4a9fea; --accent-secondary: #ff6b6b; --accent-success: #2ecc71; --shadow: 0 10px 30px rgba(0, 0, 0, 0.6); --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.3); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-primary); min-height: 100vh; padding: 20px; color: var(--text-primary); transition: all 0.3s ease; }
+        .calculator-container { max-width: 1200px; margin: 0 auto; background: var(--bg-secondary); border-radius: 15px; box-shadow: var(--shadow); overflow: hidden; transition: all 0.3s ease; }
+        .header { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 30px; text-align: center; position: relative; }
+        .back-button { position: absolute; top: 20px; left: 20px; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 25px; padding: 10px 20px; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1em; font-weight: 500; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .back-button:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2em; transition: all 0.3s ease; }
+        .theme-toggle:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; font-weight: 300; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .content { padding: 30px; background: var(--bg-secondary); transition: all 0.3s ease; }
+        .section { background: var(--bg-tertiary); border-radius: 10px; padding: 25px; margin-bottom: 25px; border-left: 4px solid var(--accent-primary); transition: all 0.3s ease; }
+        .section-title { font-size: 1.4em; color: var(--text-primary); margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; }
+        .section-title::before { content: "▶"; color: var(--accent-primary); font-size: 0.8em; }
+        .input-group { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; flex-direction: column; align-items: flex-start; }
+        .input-group label { font-weight: 500; color: var(--text-secondary); min-width: 120px; transition: all 0.3s ease; }
+        input[type="number"], input[type="text"], select { padding: 10px 15px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1em; transition: all 0.3s ease; width: 120px; background: var(--bg-card); color: var(--text-primary); }
+        input[type="number"]:focus, select:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+        select { min-width: 200px; cursor: pointer; }
+        .checkbox-group { display: flex; gap: 25px; flex-wrap: wrap; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 15px; background: var(--bg-card); border-radius: 8px; border: 2px solid var(--border-color); transition: all 0.3s ease; flex-shrink: 0; min-width: fit-content; }
+        .checkbox-item:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+        .checkbox-item input[type="checkbox"], .checkbox-item input[type="radio"] { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-item label { cursor: pointer; }
+        .results-section { background: var(--bg-card); border-radius: 10px; padding: 25px; margin-top: 20px; border: 2px solid var(--border-color); transition: all 0.3s ease; }
+        .results-title { font-size: 1.3em; color: var(--accent-success); margin-bottom: 20px; font-weight: 600; transition: all 0.3s ease; }
+        .material-group { background: var(--bg-tertiary); border-radius: 10px; padding: 20px; margin-bottom: 20px; border-left: 4px solid var(--accent-secondary); transition: all 0.3s ease; }
+        .group-title { font-size: 1.2em; color: var(--text-primary); margin-bottom: 15px; font-weight: 600; transition: all 0.3s ease; }
+        .ingredients-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .ingredient-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; transition: all 0.3s ease; }
+        .ingredient-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-light); border-color: var(--accent-primary); }
+        .ingredient-name { font-weight: 600; color: var(--text-primary); margin-bottom: 8px; font-size: 1.1em; transition: all 0.3s ease; }
+        .ingredient-details { color: var(--text-muted); margin-bottom: 8px; transition: all 0.3s ease; }
+        .ingredient-path { font-size: 0.85em; color: var(--text-light); font-style: italic; border-top: 1px dashed var(--border-light); padding-top: 8px; transition: all 0.3s ease; }
+        .no-results { text-align: center; color: var(--text-muted); font-style: italic; padding: 40px; background: var(--bg-tertiary); border-radius: 10px; transition: all 0.3s ease; }
+        .radio-group { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+        .radio-item { display: flex; align-items: center; gap: 8px; padding: 8px 15px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-weight: 500; }
+        .radio-item:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+        .radio-item:has(input:checked) { background: rgba(52, 152, 219, 0.1); border-color: var(--accent-primary); }
+        .radio-item input[type="radio"] { display: none; }
+        .radio-icon { width: 36px; height: 36px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .input-item { display: flex; flex-direction: column; gap: 5px; }
+        .input-item label { font-weight: 500; color: var(--text-secondary); }
+        .input-item input { width: 100%; }
+        .tuning-info { margin-top: 5px; font-size: 0.9em; color: var(--text-muted); }
+        .tuning-details { margin-top: 5px; font-size: 0.85em; color: var(--text-light); }
+        .cooling-section { margin-top: 20px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-tertiary); }
+        .cooling-title { font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+        .cooling-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 10px; }
+        .cooling-item { display: flex; flex-direction: column; gap: 5px; }
+        .cooling-item label { font-weight: 500; color: var(--text-secondary); }
+        .cooling-item input { width: 100%; }
+        @media (max-width: 768px) { .content { padding: 20px; } .input-group { flex-direction: column; align-items: flex-start; } .checkbox-group { flex-direction: row; gap: 15px; justify-content: flex-start; } .checkbox-item { flex: 0 0 auto; margin-bottom: 0; } .ingredients-grid { grid-template-columns: 1fr; } input[type="number"], select { width: 100%; } .theme-toggle { top: 10px; right: 10px; } .back-button { top: 10px; left: 10px; padding: 8px 15px; font-size: 0.9em; } .radio-group { gap: 10px; } .radio-item { padding: 8px 12px; font-size: 0.9em; } .input-grid { grid-template-columns: 1fr; } .cooling-grid { grid-template-columns: 1fr; } }
+        .geyser-option-content { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+        .geyser-name { font-weight: 600; color: var(--text-primary); }
+        .geyser-properties-small { display: flex; flex-direction: column; gap: 1px; }
+        .geyser-property { display: flex; align-items: center; gap: 4px; font-size: 0.75em; color: var(--text-muted); line-height: 1.2; }
+        .property-label { font-weight: 500; }
+        .property-value { color: var(--text-light); }
+        .machine-radio-item { padding: 8px 15px; min-height: auto; align-items: center; }
+        @media (max-width: 768px) { .machine-radio-item { padding: 8px 12px; } .geyser-property { font-size: 0.7em; } }
+        .geyser-option-content { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+        .geyser-name { font-weight: 600; color: var(--text-primary); }
+        .geyser-properties-small { display: flex; flex-direction: column; gap: 1px; }
+        .geyser-property { display: flex; align-items: center; gap: 4px; font-size: 0.75em; color: var(--text-muted); line-height: 1.2; }
+        .property-label { font-weight: 500; }
+        .property-value { color: var(--text-light); }
+        .machine-radio-item { padding: 8px 15px; min-height: auto; align-items: center; }
+        @media (max-width: 768px) { .machine-radio-item { padding: 8px 12px; } .geyser-property { font-size: 0.7em; } }
+        .cooling-item { display: flex; flex-direction: column; gap: 5px; }
+        .cooling-item label { font-weight: 500; color: var(--text-secondary); }
+        .cooling-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const 间歇泉 = [
+  {"名称": "二氧化碳喷孔", "类型":"气体泉", "产物_名称": "二氧化碳", "产物_温度": "500°C", "产物_病菌": "无", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 70, "活跃期平均产率_最高_千克_周期": 140, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/a/a9/%E4%BA%8C%E6%B0%A7%E5%8C%96%E7%A2%B3%E5%96%B7%E5%AD%94.png/37px-%E4%BA%8C%E6%B0%A7%E5%8C%96%E7%A2%B3%E5%96%B7%E5%AD%94.png?31531e"},
+  {"名称": "蒸汽喷孔", "类型":"气体泉", "产物_名称": "蒸汽", "产物_温度": "500°C", "产物_病菌": "无", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 500, "活跃期平均产率_最高_千克_周期": 1000, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/3/32/%E8%92%B8%E6%B1%BD%E5%96%B7%E5%AD%94.png/37px-%E8%92%B8%E6%B1%BD%E5%96%B7%E5%AD%94.png?c59335"},
+  {"名称": "低温蒸汽喷孔", "类型":"气体泉", "产物_名称": "蒸汽", "产物_温度": "110°C", "产物_病菌": "无", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 1000, "活跃期平均产率_最高_千克_周期": 2000, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/1/16/%E4%BD%8E%E6%B8%A9%E8%92%B8%E6%B1%BD%E5%96%B7%E5%AD%94.png/37px-%E4%BD%8E%E6%B8%A9%E8%92%B8%E6%B1%BD%E5%96%B7%E5%AD%94.png?873d1c"},
+  {"名称": "含菌污氧喷孔", "类型":"气体泉", "产物_名称": "污染氧", "产物_温度": "60°C", "产物_病菌": "粘液肺病菌 5000 个", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 70, "活跃期平均产率_最高_千克_周期": 140, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/e/e9/%E5%90%AB%E8%8F%8C%E6%B1%A1%E6%B0%A7%E5%96%B7%E5%AD%94.png/36px-%E5%90%AB%E8%8F%8C%E6%B1%A1%E6%B0%A7%E5%96%B7%E5%AD%94.png?22f552"},
+  {"名称": "低温氯气喷孔", "类型":"气体泉", "产物_名称": "氯气", "产物_温度": "5°C", "产物_病菌": "无", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 70, "活跃期平均产率_最高_千克_周期": 140, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/0/0b/%E4%BD%8E%E6%B8%A9%E6%B0%AF%E6%B0%94%E5%96%B7%E5%AD%94.png/36px-%E4%BD%8E%E6%B8%A9%E6%B0%AF%E6%B0%94%E5%96%B7%E5%AD%94.png?ddf90c"},
+  {"名称": "天然气喷孔", "类型":"气体泉", "产物_名称": "天然气", "产物_温度": "150°C", "产物_病菌": "无", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 70, "活跃期平均产率_最高_千克_周期": 140, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/0/0b/%E5%A4%A9%E7%84%B6%E6%B0%94%E5%96%B7%E5%AD%94.png/36px-%E5%A4%A9%E7%84%B6%E6%B0%94%E5%96%B7%E5%AD%94.png?7b5148"},
+  {"名称": "氯气喷孔", "类型":"气体泉", "产物_名称": "氯气", "产物_温度": "60°C", "产物_病菌": "无", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 70, "活跃期平均产率_最高_千克_周期": 140, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/2/2e/%E6%B0%AF%E6%B0%94%E5%96%B7%E5%AD%94.png/36px-%E6%B0%AF%E6%B0%94%E5%96%B7%E5%AD%94.png?eea092"},
+  {"名称": "氢气喷孔", "类型":"气体泉", "产物_名称": "氢气", "产物_温度": "500°C", "产物_病菌": "无", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 70, "活跃期平均产率_最高_千克_周期": 140, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/c/ca/%E6%B0%A2%E6%B0%94%E5%96%B7%E5%AD%94.png/36px-%E6%B0%A2%E6%B0%94%E5%96%B7%E5%AD%94.png?8ee2bb"},
+  {"名称": "高温污氧喷孔", "类型":"气体泉", "产物_名称": "污染氧", "产物_温度": "500°C", "产物_病菌": "无", "最大压力_千克": 5, "活跃期平均产率_最低_千克_周期": 70, "活跃期平均产率_最高_千克_周期": 140, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/4/41/%E9%AB%98%E6%B8%A9%E6%B1%A1%E6%B0%A7%E5%96%B7%E5%AD%94.png/36px-%E9%AB%98%E6%B8%A9%E6%B1%A1%E6%B0%A7%E5%96%B7%E5%AD%94.png?6bd6b2"},
+  {"名称": "盐水泉", "类型":"液体泉", "产物_名称": "盐水", "产物_温度": "95°C", "产物_病菌": "无", "最大压力_千克": 500, "活跃期平均产率_最低_千克_周期": 2000, "活跃期平均产率_最高_千克_周期": 4000, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/b/b6/%E7%9B%90%E6%B0%B4%E6%B3%89.png/77px-%E7%9B%90%E6%B0%B4%E6%B3%89.png?cc2a21"},
+  {"名称": "清水泉", "类型":"液体泉", "产物_名称": "水", "产物_温度": "95°C", "产物_病菌": "无", "最大压力_千克": 500, "活跃期平均产率_最低_千克_周期": 2000, "活跃期平均产率_最高_千克_周期": 4000, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/d/dc/%E6%B8%85%E6%B0%B4%E6%B3%89.png/77px-%E6%B8%85%E6%B0%B4%E6%B3%89.png?605457"},
+  {"名称": "二氧化碳泉", "类型":"液体泉", "产物_名称": "液态二氧化碳", "产物_温度": "-55.15°C", "产物_病菌": "无", "最大压力_千克": 50, "活跃期平均产率_最低_千克_周期": 100, "活跃期平均产率_最高_千克_周期": 200, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/f/f2/%E4%BA%8C%E6%B0%A7%E5%8C%96%E7%A2%B3%E6%B3%89.png/79px-%E4%BA%8C%E6%B0%A7%E5%8C%96%E7%A2%B3%E6%B3%89.png?22e7a1"},
+  {"名称": "污水泉", "类型":"液体泉", "产物_名称": "污染水", "产物_温度": "30°C", "产物_病菌": "食物中毒病菌 20000 个", "最大压力_千克": 500, "活跃期平均产率_最低_千克_周期": 2000, "活跃期平均产率_最高_千克_周期": 4000, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/e/ec/%E6%B1%A1%E6%B0%B4%E6%B3%89.png/79px-%E6%B1%A1%E6%B0%B4%E6%B3%89.png?f7df2e"},
+  {"名称": "低温盐泥泉", "类型":"液体泉", "产物_名称": "浓盐水", "产物_温度": "-10°C", "产物_病菌": "无", "最大压力_千克": 500, "活跃期平均产率_最低_千克_周期": 1000, "活跃期平均产率_最高_千克_周期": 2000, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/f/fe/%E4%BD%8E%E6%B8%A9%E7%9B%90%E6%B3%A5%E6%B3%89.png/80px-%E4%BD%8E%E6%B8%A9%E7%9B%90%E6%B3%A5%E6%B3%89.png?ea0949"},
+  {"名称": "低温泥浆泉", "类型":"液体泉", "产物_名称": "污染水", "产物_温度": "-10°C", "产物_病菌": "无", "最大压力_千克": 500, "活跃期平均产率_最低_千克_周期": 1000, "活跃期平均产率_最高_千克_周期": 2000, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/6/63/%E4%BD%8E%E6%B8%A9%E6%B3%A5%E6%B5%86%E6%B3%89.png/79px-%E4%BD%8E%E6%B8%A9%E6%B3%A5%E6%B5%86%E6%B3%89.png?fca1b0"},
+  {"名称": "液硫泉", "类型":"液体泉", "产物_名称": "液态硫", "产物_温度": "165.2°C", "产物_病菌": "无", "最大压力_千克": 500, "活跃期平均产率_最低_千克_周期": 1000, "活跃期平均产率_最高_千克_周期": 2000, "喷发周期时长_最低_秒": 60, "喷发周期时长_最高_秒": 1140, "喷发期占比_最低": "10%", "喷发期占比_最高": "90%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/f/f6/%E6%B6%B2%E7%A1%AB%E6%B3%89.png/77px-%E6%B6%B2%E7%A1%AB%E6%B3%89.png?55c647"},
+  {"名称": "渗油裂缝", "类型":"液体泉", "产物_名称": "原油", "产物_温度": "326.85°C", "产物_病菌": "无", "最大压力_千克": 50, "活跃期平均产率_最低_千克_周期": 1, "活跃期平均产率_最高_千克_周期": 250, "喷发周期时长_最低_秒": 600, "喷发周期时长_最高_秒": 600, "喷发期占比_最低": "100%", "喷发期占比_最高": "100%", "活跃周期时长_最低_秒": 100, "活跃周期时长_最高_秒": 500, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/e/e3/%E6%B8%97%E6%B2%B9%E8%A3%82%E7%BC%9D.png/79px-%E6%B8%97%E6%B2%B9%E8%A3%82%E7%BC%9D.png?a70a88"},
+  {"名称": "钴火山", "类型":"金属泉", "产物_名称": "熔融钴", "产物_温度": "2226.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 200, "活跃期平均产率_最高_千克_周期": 400, "喷发周期时长_最低_秒": 480, "喷发周期时长_最高_秒": 1080, "喷发期占比_最低": "1.67%", "喷发期占比_最高": "10%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/8/82/%E9%92%B4%E7%81%AB%E5%B1%B1.png/71px-%E9%92%B4%E7%81%AB%E5%B1%B1.png?739783"},
+  {"名称": "铌火山", "类型":"金属泉", "产物_名称": "熔融铌", "产物_温度": "3226.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 800, "活跃期平均产率_最高_千克_周期": 1600, "喷发周期时长_最低_秒": 6000, "喷发周期时长_最高_秒": 12000, "喷发期占比_最低": "0.5%", "喷发期占比_最高": "1%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/3/34/%E9%93%8C%E7%81%AB%E5%B1%B1.png/72px-%E9%93%8C%E7%81%AB%E5%B1%B1.png?c2f5f4"},
+  {"名称": "铝火山", "类型":"金属泉", "产物_名称": "熔融铝", "产物_温度": "1726.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 200, "活跃期平均产率_最高_千克_周期": 400, "喷发周期时长_最低_秒": 480, "喷发周期时长_最高_秒": 1080, "喷发期占比_最低": "1.67%", "喷发期占比_最高": "10%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/2/23/%E9%93%9D%E7%81%AB%E5%B1%B1.png/71px-%E9%93%9D%E7%81%AB%E5%B1%B1.png?9d4823"},
+  {"名称": "铜火山", "类型":"金属泉", "产物_名称": "熔融铜", "产物_温度": "2226.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 200, "活跃期平均产率_最高_千克_周期": 400, "喷发周期时长_最低_秒": 480, "喷发周期时长_最高_秒": 1080, "喷发期占比_最低": "1.67%", "喷发期占比_最高": "10%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/8/8f/%E9%93%9C%E7%81%AB%E5%B1%B1.png/71px-%E9%93%9C%E7%81%AB%E5%B1%B1.png?ca1ee1"},
+  {"名称": "火山", "类型":"火山", "产物_名称": "岩浆", "产物_温度": "1726.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 800, "活跃期平均产率_最高_千克_周期": 1600, "喷发周期时长_最低_秒": 6000, "喷发周期时长_最高_秒": 12000, "喷发期占比_最低": "0.5%", "喷发期占比_最高": "1%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/2/23/%E7%81%AB%E5%B1%B1.png/71px-%E7%81%AB%E5%B1%B1.png?12ff7f"},
+  {"名称": "钨火山", "类型":"金属泉", "产物_名称": "熔融钨", "产物_温度": "3726.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 200, "活跃期平均产率_最高_千克_周期": 400, "喷发周期时长_最低_秒": 480, "喷发周期时长_最高_秒": 1080, "喷发期占比_最低": "1.67%", "喷发期占比_最高": "10%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c1/%E9%92%A8%E7%81%AB%E5%B1%B1.png/71px-%E9%92%A8%E7%81%AB%E5%B1%B1.png?a92e8f"},
+  {"名称": "小型火山", "类型":"火山", "产物_名称": "岩浆", "产物_温度": "1726.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 400, "活跃期平均产率_最高_千克_周期": 800, "喷发周期时长_最低_秒": 6000, "喷发周期时长_最高_秒": 12000, "喷发期占比_最低": "0.5%", "喷发期占比_最高": "1%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/5/5f/%E5%B0%8F%E5%9E%8B%E7%81%AB%E5%B1%B1.png/71px-%E5%B0%8F%E5%9E%8B%E7%81%AB%E5%B1%B1.png?51f6ae"},
+  {"名称": "金火山", "类型":"金属泉", "产物_名称": "熔融金", "产物_温度": "2626.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 200, "活跃期平均产率_最高_千克_周期": 400, "喷发周期时长_最低_秒": 480, "喷发周期时长_最高_秒": 1080, "喷发期占比_最低": "1.67%", "喷发期占比_最高": "10%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/5/52/%E9%87%91%E7%81%AB%E5%B1%B1.png/71px-%E9%87%91%E7%81%AB%E5%B1%B1.png?d5a601"},
+  {"名称": "铁火山", "类型":"金属泉", "产物_名称": "熔融铁", "产物_温度": "2526.85°C", "产物_病菌": "无", "最大压力_千克": 150, "活跃期平均产率_最低_千克_周期": 200, "活跃期平均产率_最高_千克_周期": 400, "喷发周期时长_最低_秒": 480, "喷发周期时长_最高_秒": 1080, "喷发期占比_最低": "1.67%", "喷发期占比_最高": "10%", "活跃周期时长_最低_秒": 15000, "活跃周期时长_最高_秒": 135000, "活跃期占比_最低": "40%", "活跃期占比_最高": "80%", "图片": "https://oxygennotincluded.wiki.gg/zh/images/thumb/5/50/%E9%93%81%E7%81%AB%E5%B1%B1.png/71px-%E9%93%81%E7%81%AB%E5%B1%B1.png?79036a"},
+];
+const 比热容 = {
+    "二氧化碳": 0.846,
+    "蒸汽": 4.179,
+    "污染氧": 1.01,
+    "氯气": 0.48,
+    "天然气": 2.191,
+    "氢气": 2.4,
+    "盐水": 4.1,
+    "水": 4.179,
+    "液态二氧化碳": 0.846,
+    "污染水": 4.179,
+    "浓盐水": 3.4,
+    "液态硫": 0.7,
+    "原油": 1.69,
+    "熔融钴": 0.42,
+    "熔融铌": 0.265,
+    "熔融铝": 0.91,
+    "熔融铜": 0.386,
+    "岩浆": 1,
+    "熔融钨": 0.134,
+    "熔融金": 0.1291,
+    "熔融铁": 0.449,
+};
+const 调谐间歇泉 = [
+  {"间歇泉种类": "清水泉", "调谐所需资源": "漂白石", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 20},
+  {"间歇泉种类": "污水泉", "调谐所需资源": "漂白石", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 20},
+  {"间歇泉种类": "盐水泉", "调谐所需资源": "漂白石", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 20},
+  {"间歇泉种类": "低温泥浆泉", "调谐所需资源": "漂白石", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 20},
+  {"间歇泉种类": "低温盐泥泉", "调谐所需资源": "漂白石", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 20},
+  {"间歇泉种类": "低温蒸汽喷孔", "调谐所需资源": "漂白石", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 20},
+  {"间歇泉种类": "蒸汽喷孔", "调谐所需资源": "漂白石", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 20},
+  {"间歇泉种类": "小型火山", "调谐所需资源": "深渊晶石", "调谐资源消耗量_千克_600秒_仅喷发期": 100, "调谐后间歇泉产物的升温程度_摄氏度": 150},
+  {"间歇泉种类": "火山", "调谐所需资源": "深渊晶石", "调谐资源消耗量_千克_600秒_仅喷发期": 100, "调谐后间歇泉产物的升温程度_摄氏度": 150},
+  {"间歇泉种类": "氢气喷孔", "调谐所需资源": "深渊晶石", "调谐资源消耗量_千克_600秒_仅喷发期": 100, "调谐后间歇泉产物的升温程度_摄氏度": 15},
+  {"间歇泉种类": "天然气喷孔", "调谐所需资源": "深渊晶石", "调谐资源消耗量_千克_600秒_仅喷发期": 100, "调谐后间歇泉产物的升温程度_摄氏度": 15},
+  {"间歇泉种类": "渗油裂缝", "调谐所需资源": "深渊晶石", "调谐资源消耗量_千克_600秒_仅喷发期": 100, "调谐后间歇泉产物的升温程度_摄氏度": 15},
+  {"间歇泉种类": "液硫泉", "调谐所需资源": "深渊晶石", "调谐资源消耗量_千克_600秒_仅喷发期": 100, "调谐后间歇泉产物的升温程度_摄氏度": 15},
+  {"间歇泉种类": "铜火山", "调谐所需资源": "精炼磷", "调谐资源消耗量_千克_600秒_仅喷发期": 80, "调谐后间歇泉产物的升温程度_摄氏度": 50},
+  {"间歇泉种类": "铁火山", "调谐所需资源": "精炼磷", "调谐资源消耗量_千克_600秒_仅喷发期": 80, "调谐后间歇泉产物的升温程度_摄氏度": 50},
+  {"间歇泉种类": "金火山", "调谐所需资源": "精炼磷", "调谐资源消耗量_千克_600秒_仅喷发期": 80, "调谐后间歇泉产物的升温程度_摄氏度": 50},
+  {"间歇泉种类": "铝火山", "调谐所需资源": "精炼磷", "调谐资源消耗量_千克_600秒_仅喷发期": 80, "调谐后间歇泉产物的升温程度_摄氏度": 50},
+  {"间歇泉种类": "钨火山", "调谐所需资源": "精炼磷", "调谐资源消耗量_千克_600秒_仅喷发期": 80, "调谐后间歇泉产物的升温程度_摄氏度": 50},
+  {"间歇泉种类": "钴火山", "调谐所需资源": "精炼磷", "调谐资源消耗量_千克_600秒_仅喷发期": 80, "调谐后间歇泉产物的升温程度_摄氏度": 50},
+  {"间歇泉种类": "铌火山", "调谐所需资源": "精炼磷", "调谐资源消耗量_千克_600秒_仅喷发期": 80, "调谐后间歇泉产物的升温程度_摄氏度": 50},
+  {"间歇泉种类": "氯气喷孔", "调谐所需资源": "盐", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 15},
+  {"间歇泉种类": "低温氯气喷孔", "调谐所需资源": "盐", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 15},
+  {"间歇泉种类": "含菌污氧喷孔", "调谐所需资源": "盐", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 15},
+  {"间歇泉种类": "高温污氧喷孔", "调谐所需资源": "盐", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 15},
+  {"间歇泉种类": "二氧化碳泉", "调谐所需资源": "污染土", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 5},
+  {"间歇泉种类": "二氧化碳喷孔", "调谐所需资源": "污染土", "调谐资源消耗量_千克_600秒_仅喷发期": 50, "调谐后间歇泉产物的升温程度_摄氏度": 5}
+];
+
+// 假设蒸汽机满效率运行
+const STEAM_ROOM_TEMP = 200;
+const STEAM_TURBINE_CONSUMPTION = 2; // 每台蒸汽机每秒消耗2kg蒸汽
+const WATER_SHC = 比热容["水"];
+
+// 蒸汽涡轮机发电功率 = 蒸汽吸入质量 × (蒸汽温度 - 95) × 4.179 × 850 ÷ 877.59
+
+function GeyserCalculator() {
+    const [selectedGeyser, setSelectedGeyser] = React.useState("");
+    const [eruptionRate, setEruptionRate] = React.useState(""); //产出
+    const [baseTemperature, setBaseTemperature] = React.useState(""); // 基础温度（不可修改）
+    const [currentTemperature, setCurrentTemperature] = React.useState(""); // 当前温度（考虑调谐）
+    const [totalEruptionTime, setTotalEruptionTime] = React.useState(""); // 喷发总时间
+    const [eruptionDuration, setEruptionDuration] = React.useState(""); //喷发时间
+    const [totalActiveCycles, setTotalActiveCycles] = React.useState(""); //活跃总周期
+    const [activeCycles, setActiveCycles] = React.useState("");//活跃周期
+    const [tuningCount, setTuningCount] = React.useState(0);
+    const [averageOutput, setAverageOutput] = React.useState("");
+    const [targetTemperature, setTargetTemperature] = React.useState("25");
+    const [steamMass, setSteamMass] = React.useState("");
+    const [turbineCount, setTurbineCount] = React.useState("");
+    const [heatReleased, setHeatReleased] = React.useState("");
+    const [isDarkTheme, setIsDarkTheme] = React.useState(false);
+    const [selectedType, setSelectedType] = React.useState("全部");
+
+    const geyserTypes = [...new Set(间歇泉.map(g => g.类型))];
+    const filteredGeysers = selectedType === "全部"
+        ? 间歇泉
+        : 间歇泉.filter(g => g.类型 === selectedType);
+
+    React.useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setIsDarkTheme(mediaQuery.matches);
+
+        const handleChange = (e) => {
+            setIsDarkTheme(e.matches);
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
+
+    React.useEffect(() => {
+        document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
+    }, [isDarkTheme]);
+
+    const goToHome = () => {
+        window.location.href = 'index.html';
+    };
+
+    const toggleTheme = () => {
+        setIsDarkTheme(!isDarkTheme);
+    };
+
+    const calculateTunedTemperature = () => {
+        if (!selectedGeyser || !baseTemperature || tuningCount === 0) {
+            return baseTemperature;
+        }
+
+        const tuningData = 调谐间歇泉.find(t => t.间歇泉种类 === selectedGeyser);
+        if (!tuningData) {
+            return baseTemperature;
+        }
+
+        const baseTemp = parseFloat(baseTemperature);
+        const tempIncrease = tuningCount * tuningData.调谐后间歇泉产物的升温程度_摄氏度;
+        const tunedTemp = baseTemp + tempIncrease;
+
+        return tunedTemp.toFixed(1);
+    };
+
+    React.useEffect(() => {
+        if (selectedGeyser) {
+            const geyser = 间歇泉.find(g => g.名称 === selectedGeyser);
+            if (geyser) {
+                const tempValue = geyser.产物_温度.replace('°C', '');
+                setBaseTemperature(tempValue);
+                setCurrentTemperature(tempValue);
+            }
+        } else {
+            setEruptionRate("");
+            setBaseTemperature("");
+            setCurrentTemperature("");
+            setTotalEruptionTime("");
+            setEruptionDuration("");
+            setTotalActiveCycles("");
+            setActiveCycles("");
+            setAverageOutput("");
+            setTuningCount(0);
+            setSteamMass("");
+            setTurbineCount("");
+        }
+    }, [selectedGeyser]);
+
+    React.useEffect(() => {
+        if (selectedGeyser && baseTemperature) {
+            const tunedTemp = calculateTunedTemperature();
+            setCurrentTemperature(tunedTemp);
+        }
+    }, [tuningCount, selectedGeyser, baseTemperature]);
+
+    const calculateAverageOutput = () => {
+        if (!eruptionRate || !totalEruptionTime || !eruptionDuration || !totalActiveCycles || !activeCycles) {
+            setAverageOutput("");
+            return;
+        }
+
+        const rate = parseFloat(eruptionRate); //产物
+        const totalTime = parseFloat(totalEruptionTime); //喷发总时间
+        const duration = parseFloat(eruptionDuration); //喷发时间
+        const totalCycles = parseFloat(totalActiveCycles); //活跃总周期
+        const active = parseFloat(activeCycles); //活跃周期
+
+        if (rate <= 0 || totalTime <= 0 || duration <= 0 || totalCycles <= 0 || active <= 0) {
+            setAverageOutput("输入数据无效");
+            return;
+        }
+
+        // 计算基础平均产量 (kg/s)
+        // 平均产量 = (喷发率 × 喷发时间 × 活跃周期) / (喷发总时间 × 总周期)
+        const baseAverageKgPerSecond = (rate * duration * active) / (totalTime * totalCycles);
+
+        const tuningMultiplier = 1 + tuningCount * 0.2;
+        const tunedAverageKgPerSecond = baseAverageKgPerSecond * tuningMultiplier;
+
+        const averageGPerSecond = tunedAverageKgPerSecond * 1000;
+        setAverageOutput(`${averageGPerSecond.toFixed(2)}g/s`);
+    };
+
+    const calculateHeatRequirements = () => {
+        if (!eruptionRate || !eruptionDuration || !currentTemperature || !totalEruptionTime) {
+            setSteamMass("");
+            setTurbineCount("");
+            return;
+        }
+
+        const rate = parseFloat(eruptionRate);
+        const duration = parseFloat(eruptionDuration);
+        const temp = parseFloat(currentTemperature);
+        const totalTime = parseFloat(totalEruptionTime);
+
+        const geyser = 间歇泉.find(g => g.名称 === selectedGeyser);
+        if (!geyser) return;
+
+        const productSHC = 比热容[geyser.产物_名称];
+        if (!productSHC) return;
+
+        const totalMass = rate * duration;
+        let heatReleased = totalMass * productSHC * (temp - targetTemperature); // 千焦
+        const minWaterMass = heatReleased / (WATER_SHC * (STEAM_ROOM_TEMP - 125)); // kg
+
+        const heatPerKgSteam = WATER_SHC * (STEAM_ROOM_TEMP - 95); // kJ/kg
+        const totalSteamRequired = heatReleased / heatPerKgSteam; // 需要的总蒸汽质量 (kg)
+        const steamPerSecondRequired = totalSteamRequired / totalTime; // 平均每秒需要的蒸汽 (kg/s)
+        const turbinesRequired = (steamPerSecondRequired / STEAM_TURBINE_CONSUMPTION).toFixed(2); // 每台蒸汽机处理2kg/s
+
+        setSteamMass(minWaterMass.toFixed(2));
+        setTurbineCount(turbinesRequired.toString());
+        setHeatReleased(heatReleased.toFixed(2));
+    };
+
+    React.useEffect(() => {
+        calculateAverageOutput();
+        calculateHeatRequirements();
+    }, [eruptionRate, totalEruptionTime, eruptionDuration, totalActiveCycles, activeCycles, tuningCount, currentTemperature, targetTemperature]);
+
+    const getTuningInfo = () => {
+        if (!selectedGeyser || tuningCount === 0) return null;
+
+        const tuningData = 调谐间歇泉.find(t => t.间歇泉种类 === selectedGeyser);
+        if (!tuningData) return null;
+
+        const totalTempIncrease = tuningCount * tuningData.调谐后间歇泉产物的升温程度_摄氏度;
+        const totalResourceConsumption = tuningCount * tuningData.调谐资源消耗量_千克_600秒_仅喷发期;
+
+        return {
+            调谐资源: tuningData.调谐所需资源,
+            总升温: totalTempIncrease,
+            总资源消耗: totalResourceConsumption
+        };
+    };
+
+    const tuningInfo = getTuningInfo();
+
+    return (
+        <div className="calculator-container">
+            <div className="header">
+                <button className="back-button" onClick={goToHome} title="返回首页">🏠 返回首页</button>
+                <button className="theme-toggle" onClick={toggleTheme} title="切换主题">
+                    {isDarkTheme ? '☀️' : '🌙'}
+                </button>
+                <h1>🌋 缺氧间歇泉计算器</h1>
+                <p>计算间歇泉产量和冷却需求，优化你的资源管理</p>
+            </div>
+
+            <div className="content">
+                <div className="section">
+                    <div className="section-title">🌋 间歇泉选择</div>
+                    <div className="input-group">
+                        <div>选择类型:</div>
+                        <div className="checkbox-group">
+                            <div className="checkbox-item">
+                                <input
+                                    type="radio"
+                                    id="type-all"
+                                    name="geyserType"
+                                    value="全部"
+                                    checked={selectedType === "全部"}
+                                    onChange={(e) => setSelectedType(e.target.value)}
+                                />
+                                <label htmlFor="type-all">全部</label>
+                            </div>
+                            {geyserTypes.map(type => (
+                                <div key={type} className="checkbox-item">
+                                    <input
+                                        type="radio"
+                                        id={`type-${type}`}
+                                        name="geyserType"
+                                        value={type}
+                                        checked={selectedType === type}
+                                        onChange={(e) => setSelectedType(e.target.value)}
+                                    />
+                                    <label htmlFor={`type-${type}`}>{type}</label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="input-group">
+                        <div>选择间歇泉:</div>
+                        <div className="radio-group">
+                            {filteredGeysers.map(geyser => (
+                                <label key={geyser.名称} className="radio-item machine-radio-item">
+                                    <input
+                                        type="radio"
+                                        name="geyser"
+                                        value={geyser.名称}
+                                        checked={selectedGeyser === geyser.名称}
+                                        onChange={(e) => setSelectedGeyser(e.target.value)}
+                                    />
+                                    {geyser.图片 && (
+                                        <img src={geyser.图片} alt={geyser.名称} className="radio-icon" />
+                                    )}
+                                    <div className="geyser-option-content">
+                                        <div className="geyser-name">{geyser.名称}</div>
+                                        <div className="geyser-properties-small">
+                                            <div className="geyser-property">
+                                                <span className="property-label">类型:</span>
+                                                <span className="property-value">{geyser.类型}</span>
+                                            </div>
+                                            <div className="geyser-property">
+                                                <span className="property-label">产物:</span>
+                                                <span className="property-value">{geyser.产物_名称}</span>
+                                            </div>
+                                            <div className="geyser-property">
+                                                <span className="property-label">温度:</span>
+                                                <span className="property-value">{geyser.产物_温度}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {selectedGeyser && (
+                    <>
+                        <div className="section">
+                            <div className="section-title">📊 间歇泉数据</div>
+                            <div className="input-grid">
+                                <div className="input-item">
+                                    <label>产出(kg/s):</label>
+                                    <input
+                                        type="number"
+                                        value={eruptionRate}
+                                        onChange={(e) => setEruptionRate(e.target.value)}
+                                        step="0.1"
+                                        min="0"
+                                    />
+                                </div>
+                                <div className="input-item">
+                                    <label>温度(°C):</label>
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+                                        <input
+                                            type="number"
+                                            value={currentTemperature}
+                                            readOnly
+                                            style={{
+                                                backgroundColor: '#f0f0f0',
+                                                color: '#666'
+                                            }}
+                                        />
+                                        {tuningCount > 0 && (
+                                            <span
+                                                className="tuning-info"
+                                                title={`基础温度: ${baseTemperature}°C + 调谐升温`}
+                                            >
+                                                (+{(parseFloat(currentTemperature) - parseFloat(baseTemperature)).toFixed(2)}°C)
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="input-item">
+                                    <label>喷发总时间(秒):</label>
+                                    <input
+                                        type="number"
+                                        value={totalEruptionTime}
+                                        onChange={(e) => setTotalEruptionTime(e.target.value)}
+                                        step="1"
+                                        min="0"
+                                    />
+                                </div>
+                                <div className="input-item">
+                                    <label>喷发时间(秒):</label>
+                                    <input
+                                        type="number"
+                                        value={eruptionDuration}
+                                        onChange={(e) => setEruptionDuration(e.target.value)}
+                                        step="1"
+                                        min="0"
+                                    />
+                                </div>
+                                <div className="input-item">
+                                    <label>活跃总周期(周期):</label>
+                                    <input
+                                        type="number"
+                                        value={totalActiveCycles}
+                                        onChange={(e) => setTotalActiveCycles(e.target.value)}
+                                        step="0.1"
+                                        min="0"
+                                    />
+                                </div>
+                                <div className="input-item">
+                                    <label>活跃周期(周期):</label>
+                                    <input
+                                        type="number"
+                                        value={activeCycles}
+                                        onChange={(e) => setActiveCycles(e.target.value)}
+                                        step="0.1"
+                                        min="0"
+                                    />
+                                </div>
+                                <div className="input-item">
+                                    <label>平均产量:</label>
+                                    <input
+                                        type="text"
+                                        value={averageOutput}
+                                        readOnly
+                                        style={{
+                                            backgroundColor: '#f0f0f0',
+                                            color: '#666'
+                                        }}
+                                        placeholder="输入数据后自动计算"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="section">
+                            <div className="section-title">⚙️ 调谐设置</div>
+                            <div className="input-group">
+                                <label>调谐次数 (0-5次):</label>
+                                <div style={{display: 'flex', gap: '10px', alignItems: 'center', width: '100%'}}>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="5"
+                                        value={tuningCount}
+                                        onChange={(e) => setTuningCount(parseInt(e.target.value))}
+                                        style={{flex: 1}}
+                                    />
+                                    <span style={{fontWeight: 'bold', minWidth: '30px'}}>{tuningCount}</span>
+                                </div>
+                                {tuningCount > 0 && (
+                                    <div className="tuning-details">
+                                        每次调谐增加20%产量
+                                        {tuningInfo && (
+                                            <div>
+                                                总升温: +{tuningInfo.总升温}°C |
+                                                资源消耗: {tuningInfo.总资源消耗}kg {tuningInfo.调谐资源}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="cooling-section">
+                            <div className="cooling-title">❄️ 降温参考</div>
+                            <div style={{marginBottom: '10px', color: 'var(--text-muted)'}}>
+                                假设蒸汽机吸收的蒸汽温度：200°C
+                            </div>
+                            <div className="input-item" style={{width: '120px'}}>
+                                <label>目标温度(°C):</label>
+                                <input
+                                    type="number"
+                                    value={targetTemperature}
+                                    onChange={e=>setTargetTemperature(e.target.value)}
+                                />
+                            </div>
+                            <div className="cooling-grid">
+                                <div className="cooling-item">
+                                    <label>每次喷发释放的热量:</label>
+                                    <div style={{
+                                        padding: '10px 15px',
+                                        backgroundColor: 'var(--bg-card)',
+                                        border: '2px solid var(--border-color)',
+                                        borderRadius: '8px',
+                                        color: 'var(--text-primary)',
+                                        fontWeight: '500'
+                                    }}>
+                                        {heatReleased || '0'} 千焦
+                                    </div>
+                                </div>
+                                <div className="cooling-item">
+                                    <label>蒸汽机数量:</label>
+                                    <div style={{
+                                        padding: '10px 15px',
+                                        backgroundColor: 'var(--bg-card)',
+                                        border: '2px solid var(--border-color)',
+                                        borderRadius: '8px',
+                                        color: 'var(--text-primary)',
+                                        fontWeight: '500'
+                                    }}>
+                                        {turbineCount || '0'} 台
+                                    </div>
+                                </div>
+                                <div className="cooling-item">
+                                    <label>蒸汽室最小水质量:</label>
+                                    <div style={{
+                                        padding: '10px 15px',
+                                        backgroundColor: 'var(--bg-card)',
+                                        border: '2px solid var(--border-color)',
+                                        borderRadius: '8px',
+                                        color: 'var(--text-primary)',
+                                        fontWeight: '500'
+                                    }}>
+                                        {steamMass || '0'} kg
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<GeyserCalculator />);
+</script>
+</body>
+</html>
