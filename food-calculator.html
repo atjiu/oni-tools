@@ -77,6 +77,45 @@
             position: relative;
         }
 
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .back-button {
+                top: 10px;
+                left: 10px;
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+        }
+
         .theme-toggle {
             position: absolute;
             top: 20px;
@@ -745,6 +784,10 @@
             document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
         }, [isDarkTheme]);
 
+        const goToHome = () => {
+            window.location.href = '/index.html';
+        };
+
         const toggleTheme = () => {
             setIsDarkTheme(!isDarkTheme);
         };
@@ -911,6 +954,7 @@
         return (
             <div className="calculator-container">
                 <div className="header">
+                    <button class="back-button" onClick={goToHome} title="返回首页">🏠 返回首页</button>
                     <button className="theme-toggle" onClick={toggleTheme} title="切换主题">
                         {isDarkTheme ? '☀️' : '🌙'}
                     </button>
