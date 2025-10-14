@@ -401,7 +401,7 @@ const 植物 = {
     "羽叶果薯植株": {"生长周期": [9,36], "人工培育": {"灌溉": {"乙醇":[15,0]}}, "羽叶果薯": 1,"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%BE%BD%E5%8F%B6%E6%9E%9C%E8%96%AF%E6%A4%8D%E6%A0%AA.png/50px-%E7%BE%BD%E5%8F%B6%E6%9E%9C%E8%96%AF%E6%A4%8D%E6%A0%AA.png?e5af9e"},
     "汗甜玉米杆": {"生长周期": [3,12], "人工培育": {"施肥": {"泥炭":[10,0]}}, "汗甜玉米": 1,"图片":"https://oxygennotincluded.wiki.gg/zh/images/%E6%B1%97%E7%94%9C%E7%8E%89%E7%B1%B3%E7%A7%86.png?5ae5a2"},
     "巨蕨": {"生长周期": [9,36], "人工培育": {"灌溉": {"氯气":[54,13.5]}}, "巨蕨谷粒": 36,"图片":"https://oxygennotincluded.wiki.gg/zh/images/%E5%B7%A8%E8%95%A8.png?3f8d18"},
-    "乔木树": {"生长周期": [4.5,18], "人工培育": {"灌溉": {"污染水":[70,0]}, "施肥": {"泥土":[10,0]}}, "木材": 300,"图片":"https://oxygennotincluded.wiki.gg/zh/images/%E4%B9%94%E6%9C%A8%E6%A0%91.png?3bb518"},
+    "乔木树": {"生长周期": [0.9,3.6] /*乔木5个树枝独立生长*/, "人工培育": {"灌溉": {"污染水":[70,0]}, "施肥": {"泥土":[10,0]}}, "木材": 300,"图片":"https://oxygennotincluded.wiki.gg/zh/images/%E4%B9%94%E6%9C%A8%E6%A0%91.png?3bb518"},
     "露珠藤": {"生长周期": [2,8], "人工培育": {"施肥": {"浓盐冰":[10,0]}}, "露珠": 1,"图片":"https://oxygennotincluded.wiki.gg/zh/images/%E9%9C%B2%E7%8F%A0%E8%97%A4.png?d68e83"},
     "芳香百合": {"生长周期": [12,48], "人工培育": {}, "芳香百合花": 2,"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/%E8%8A%B3%E9%A6%99%E7%99%BE%E5%90%88%E8%8A%B1.png/42px-%E8%8A%B3%E9%A6%99%E7%99%BE%E5%90%88%E8%8A%B1.png?e1af8b"},
     "糖心树": {"生长周期": [4.5,18], "人工培育": {"施肥": {"雪":[100,0]}}, "花蜜": 20,"图片":"https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%B3%96%E5%BF%83%E6%A0%91.png/50px-%E7%B3%96%E5%BF%83%E6%A0%91.png?2b2083"},
@@ -729,7 +729,7 @@ function CritterCalculator() {
                             step="1"
                             min="1"
                             value={critterNumber}
-                            onChange={e => setCritterNumber(parseInt(e.target.value) || 8)}
+                            onChange={e => setCritterNumber(parseInt(e.target.value))}
                         />
                     </div>
                 </div>
