@@ -8,6 +8,7 @@
     <!-- <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script> -->
+    <script src="./js/consts.js"></script>
     <script src="./js/react-development-18.3.1.js"></script>
     <script src="./js/react-dom-development-18.3.1.js"></script>
     <script src="./js/babel-min-7.28.4.js"></script>
@@ -1411,52 +1412,52 @@
             }
         ];
         const liquidNames = {
-            "Brine": {"zh": "浓盐水", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B5%93%E7%9B%90%E6%B0%B4.png/24px-%E6%B5%93%E7%9B%90%E6%B0%B4.png?23e011"},
-            "Chlorine": {"zh": "液态氯", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%B0%AF.png/24px-%E6%B6%B2%E6%80%81%E6%B0%AF.png?e9ceef"},
-            "CrudeOil": {"zh": "原油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%8E%9F%E6%B2%B9.png/24px-%E5%8E%9F%E6%B2%B9.png?a0cf2d"},
-            "DirtyWater": {"zh": "污染水", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B1%A1%E6%9F%93%E6%B0%B4.png/24px-%E6%B1%A1%E6%9F%93%E6%B0%B4.png?d0c54d"},
-            "LiquidCarbonDioxide": {"zh": "液态二氧化碳", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E4%BA%8C%E6%B0%A7%E5%8C%96%E7%A2%B3.png/24px-%E6%B6%B2%E6%80%81%E4%BA%8C%E6%B0%A7%E5%8C%96%E7%A2%B3.png?d482cf"},
-            "LiquidGunk": {"zh": "粘渣油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%B2%98%E6%B8%A3%E6%B2%B9.png/24px-%E7%B2%98%E6%B8%A3%E6%B2%B9.png?601144"},
-            "LiquidHelium": {"zh": "液态氦", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%B0%A6.png/24px-%E6%B6%B2%E6%80%81%E6%B0%A6.png?513315"},
-            "LiquidHydrogen": {"zh": "液态氢", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%B0%A2.png/24px-%E6%B6%B2%E6%80%81%E6%B0%A2.png?2a860f"},
-            "LiquidMethane": {"zh": "液态甲烷", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E7%94%B2%E7%83%B7.png/24px-%E6%B6%B2%E6%80%81%E7%94%B2%E7%83%B7.png?c1f736"},
-            "LiquidOxygen": {"zh": "液态氧", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%B0%A7.png/24px-%E6%B6%B2%E6%80%81%E6%B0%A7.png?f5eba2"},
-            "LiquidPhosphorus": {"zh": "液态磷", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E7%A3%B7.png/24px-%E6%B6%B2%E6%80%81%E7%A3%B7.png?f9730f"},
-            "LiquidPropane": {"zh": "液态丙烷", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E4%B8%99%E7%83%B7.png/24px-%E6%B6%B2%E6%80%81%E4%B8%99%E7%83%B7.png?f4523e"},
-            "LiquidSulfur": {"zh": "液态硫", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E7%A1%AB.png/24px-%E6%B6%B2%E6%80%81%E7%A1%AB.png?d33601"},
-            "Milk": {"zh": "咸乳", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%92%B8%E4%B9%B3.png/24px-%E5%92%B8%E4%B9%B3.png?9b9c44"},
-            "Magma": {"zh": "岩浆", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E5%B2%A9%E6%B5%86.png/24px-%E5%B2%A9%E6%B5%86.png?b31e9e"},
-            "Mercury": {"zh": "汞", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B1%9E.png/24px-%E6%B1%9E.png?b53990"},
-            "MoltenAluminum": {"zh": "熔融铝", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%9D.png/24px-%E7%86%94%E8%9E%8D%E9%93%9D.png?3d6d42"},
-            "MoltenCarbon": {"zh": "熔融碳", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E7%A2%B3.png/24px-%E7%86%94%E8%9E%8D%E7%A2%B3.png?87c80f"},
-            "MoltenCopper": {"zh": "熔融铜", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%9C.png/24px-%E7%86%94%E8%9E%8D%E9%93%9C.png?765927"},
-            "MoltenGlass": {"zh": "熔融玻璃", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E7%8E%BB%E7%92%83.png/24px-%E7%86%94%E8%9E%8D%E7%8E%BB%E7%92%83.png?f32f90"},
-            "MoltenGold": {"zh": "熔融金", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%87%91.png/24px-%E7%86%94%E8%9E%8D%E9%87%91.png?4fe2be"},
-            "MoltenIron": {"zh": "熔融铁", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%81.png/24px-%E7%86%94%E8%9E%8D%E9%93%81.png?3d6d42"},
-            "MoltenCobalt": {"zh": "熔融钴", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%92%B4.png/24px-%E7%86%94%E8%9E%8D%E9%92%B4.png?77ea64"},
-            "MoltenLead": {"zh": "熔融铅", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%85.png/24px-%E7%86%94%E8%9E%8D%E9%93%85.png?4fe2be"},
-            "MoltenNiobium": {"zh": "熔融铌", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%8C.png/24px-%E7%86%94%E8%9E%8D%E9%93%8C.png?e621a4"},
-            "MoltenSalt": {"zh": "熔融盐", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E7%9B%90.png/24px-%E7%86%94%E8%9E%8D%E7%9B%90.png?b87a7f"},
-            "MoltenSteel": {"zh": "熔融钢", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%92%A2.png/24px-%E7%86%94%E8%9E%8D%E9%92%A2.png?19eb97"},
-            "MoltenTungsten": {"zh": "熔融钨", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%92%A8.png/24px-%E7%86%94%E8%9E%8D%E9%92%A8.png?acb222"},
-            "MoltenUranium": {"zh": "熔融铀", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%80.png/24px-%E7%86%94%E8%9E%8D%E9%93%80.png?4abe6d"},
-            "Naphtha": {"zh": "液态石脑油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E7%9F%B3%E8%84%91%E6%B2%B9.png/24px-%E6%B6%B2%E6%80%81%E7%9F%B3%E8%84%91%E6%B2%B9.png?7eab9b"},
-            "NuclearWaste": {"zh": "液态核废料", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B6%B2%E6%80%81%E6%A0%B8%E5%BA%9F%E6%96%99.png/24px-%E6%B6%B2%E6%80%81%E6%A0%B8%E5%BA%9F%E6%96%99.png?937639"},
-            "Petroleum": {"zh": "石油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%9F%B3%E6%B2%B9.png/24px-%E7%9F%B3%E6%B2%B9.png?5d6f84"},
-            "NaturalResin": {"zh": "树脂", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%A0%91%E8%84%82.png/24px-%E6%A0%91%E8%84%82.png?2c3b0b"},
-            "Resin": {"zh": "树液", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%A0%91%E6%B6%B2.png/24px-%E6%A0%91%E6%B6%B2.png?2c3b0b"},
-            "SaltWater": {"zh": "盐水", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%9B%90%E6%B0%B4.png/24px-%E7%9B%90%E6%B0%B4.png?2c636f"},
-            "SugarWater": {"zh": "花蜜", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E8%8A%B1%E8%9C%9C.png/24px-%E8%8A%B1%E8%9C%9C.png?bb9575"},
-            "SuperCoolant": {"zh": "超级冷却剂", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E8%B6%85%E7%BA%A7%E5%86%B7%E5%8D%B4%E5%89%82.png/24px-%E8%B6%85%E7%BA%A7%E5%86%B7%E5%8D%B4%E5%89%82.png?8c4e80"},
-            "ViscoGel": {"zh": "粘性凝胶", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%B2%98%E6%80%A7%E5%87%9D%E8%83%B6%E6%B5%81%E4%BD%93.png/24px-%E7%B2%98%E6%80%A7%E5%87%9D%E8%83%B6%E6%B5%81%E4%BD%93.png?f6f3fa"},
-            "Water": {"zh": "水", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B0%B4.png/24px-%E6%B0%B4.png?26c664"},
-            "Ethanol": {"zh": "乙醇", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E4%B9%99%E9%86%87.png/24px-%E4%B9%99%E9%86%87.png?e81435"},
-            "MoltenSyngas": {"zh": "熔融合成气", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E5%90%88%E6%88%90%E6%B0%94.png/24px-%E7%86%94%E8%9E%8D%E5%90%88%E6%88%90%E6%B0%94.png?7bd88f"},
-            "PhytoOil": {"zh": "植物润滑油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%A4%8D%E7%89%A9%E6%B6%A6%E6%BB%91%E6%B2%B9.png/24px-%E6%A4%8D%E7%89%A9%E6%B6%A6%E6%BB%91%E6%B2%B9.png?8dcf96"},
-            "RefinedLipid": {"zh": "生物柴油", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%94%9F%E7%89%A9%E6%9F%B4%E6%B2%B9.png/24px-%E7%94%9F%E7%89%A9%E6%9F%B4%E6%B2%B9.png?2a45af"},
-            "MoltenSucrose": {"zh": "熔融蔗糖", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E8%94%97%E7%B3%96.png/24px-%E7%86%94%E8%9E%8D%E8%94%97%E7%B3%96.png?bb9575"},
-            "MoltenNickel": {"zh": "熔融镍", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%95%8D.png/24px-%E7%86%94%E8%9E%8D%E9%95%8D.png?90d8c4"},
-            "MoltenIridium": {"zh": "熔融铱", "image": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%94%E8%9E%8D%E9%93%B1.png/24px-%E7%86%94%E8%9E%8D%E9%93%B1.png?c75299"},
+            "Brine": "浓盐水",
+            "Chlorine": "液态氯",
+            "CrudeOil": "原油",
+            "DirtyWater": "污染水",
+            "LiquidCarbonDioxide": "液态二氧化碳",
+            "LiquidGunk": "粘渣油",
+            "LiquidHelium": "液态氦",
+            "LiquidHydrogen": "液态氢",
+            "LiquidMethane": "液态甲烷",
+            "LiquidOxygen": "液态氧",
+            "LiquidPhosphorus": "液态磷",
+            "LiquidPropane": "液态丙烷",
+            "LiquidSulfur": "液态硫",
+            "Milk": "咸乳",
+            "Magma": "岩浆",
+            "Mercury": "汞",
+            "MoltenAluminum": "熔融铝",
+            "MoltenCarbon": "熔融碳",
+            "MoltenCopper": "熔融铜",
+            "MoltenGlass": "熔融玻璃",
+            "MoltenGold": "熔融金",
+            "MoltenIron": "熔融铁",
+            "MoltenCobalt": "熔融钴",
+            "MoltenLead": "熔融铅",
+            "MoltenNiobium": "熔融铌",
+            "MoltenSalt": "熔融盐",
+            "MoltenSteel": "熔融钢",
+            "MoltenTungsten": "熔融钨",
+            "MoltenUranium": "熔融铀",
+            "Naphtha": "液态石脑油",
+            "NuclearWaste": "液态核废料",
+            "Petroleum": "石油",
+            "NaturalResin": "树脂",
+            "Resin": "树液",
+            "SaltWater": "盐水",
+            "SugarWater": "花蜜",
+            "SuperCoolant": "超级冷却剂",
+            "ViscoGel": "粘性凝胶流体",
+            "Water": "水",
+            "Ethanol": "乙醇",
+            "MoltenSyngas": "熔融合成气",
+            "PhytoOil": "植物润滑油",
+            "RefinedLipid": "生物柴油",
+            "MoltenSucrose": "熔融蔗糖",
+            "MoltenNickel": "熔融镍",
+            "MoltenIridium": "熔融铱",
         };
         function LiquidData() {
             const [isDarkTheme, setIsDarkTheme] = React.useState(false);
@@ -1613,15 +1614,15 @@
                                         <tr key={index}>
                                             <td>
                                                 <div className="liquid-with-icon">
-                                                    {liquidNames[item.elementId]?.image && (
+                                                    {图片[liquidNames[item.elementId]] && (
                                                         <img
-                                                            src={liquidNames[item.elementId].image}
-                                                            alt={liquidNames[item.elementId].zh}
+                                                            src={图片[liquidNames[item.elementId]]}
+                                                            alt={liquidNames[item.elementId]}
                                                             className="liquid-icon"
                                                         />
                                                     )}
                                                     <span className="liquid-name">
-                                                        {liquidNames[item.elementId]?.zh || item.elementId}
+                                                        {liquidNames[item.elementId] || item.elementId}
                                                     </span>
                                                 </div>
                                             </td>
