@@ -1,30 +1,79 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>缺氧发电计算器</title>
-    <!-- <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script> -->
+    <script src="./js/consts.js"></script>
     <script src="./js/react-development-18.3.1.js"></script>
     <script src="./js/react-dom-development-18.3.1.js"></script>
     <script src="./js/babel-min-7.28.4.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%); --bg-secondary: white; --bg-tertiary: #f8f9fa; --bg-card: white; --text-primary: #2c3e50; --text-secondary: #34495e; --text-muted: #7f8c8d; --text-light: #95a5a6; --border-color: #e1e8ed; --border-light: #ecf0f1; --accent-primary: #3498db; --accent-secondary: #e74c3c; --accent-success: #27ae60; --shadow: 0 10px 30px rgba(0, 0, 0, 0.3); --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.1); }
+        [data-theme="dark"] { --bg-primary: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); --bg-secondary: #1a1a1a; --bg-tertiary: #2d2d2d; --bg-card: #2d2d2d; --text-primary: #ffffff; --text-secondary: #e0e0e0; --text-muted: #b0b0b0; --text-light: #888888; --border-color: #404040; --border-light: #505050; --accent-primary: #4a9fea; --accent-secondary: #ff6b6b; --accent-success: #2ecc71; --shadow: 0 10px 30px rgba(0, 0, 0, 0.6); --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.3); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-primary); min-height: 100vh; padding: 20px; color: var(--text-primary); transition: all 0.3s ease; }
+        .calculator-container { max-width: 1200px; margin: 0 auto; background: var(--bg-secondary); border-radius: 15px; box-shadow: var(--shadow); overflow: hidden; transition: all 0.3s ease; }
+        .header { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 30px; text-align: center; position: relative; }
+        .back-button { position: absolute; top: 20px; left: 20px; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 25px; padding: 10px 20px; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 1em; font-weight: 500; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .back-button:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2em; transition: all 0.3s ease; }
+        .theme-toggle:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; font-weight: 300; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .content { padding: 30px; background: var(--bg-secondary); transition: all 0.3s ease; }
+        .section { background: var(--bg-tertiary); border-radius: 10px; padding: 25px; margin-bottom: 25px; border-left: 4px solid var(--accent-primary); transition: all 0.3s ease; }
+        .section-title { font-size: 1.4em; color: var(--text-primary); margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; }
+        .section-title::before { content: "▶"; color: var(--accent-primary); font-size: 0.8em; }
+        .input-group { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; flex-direction: column; align-items: flex-start; }
+        .input-group label { font-weight: 500; color: var(--text-secondary); min-width: 120px; transition: all 0.3s ease; }
+        input[type="number"] { padding: 10px 15px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1em; transition: all 0.3s ease; width: 120px; background: var(--bg-card); color: var(--text-primary); }
+        input[type="number"]:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+        select { padding: 10px 15px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1em; background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: all 0.3s ease; min-width: 200px; }
+        select:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+        .checkbox-group { display: flex; gap: 25px; flex-wrap: wrap; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 15px; background: var(--bg-card); border-radius: 8px; border: 2px solid var(--border-color); transition: all 0.3s ease; flex-shrink: 0; min-width: fit-content; }
+        .checkbox-item:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+        .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-item label { cursor: pointer; }
+        .radio-group { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+        .radio-item { display: flex; align-items: center; gap: 8px; padding: 8px 15px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-weight: 500; }
+        .radio-item:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+        .radio-item:has(input:checked) { background: rgba(52, 152, 219, 0.1); border-color: var(--accent-primary); }
+        .radio-item input[type="radio"] { display: none; }
+        .results-section { background: var(--bg-card); border-radius: 10px; padding: 25px; margin-top: 20px; border: 2px solid var(--border-color); transition: all 0.3s ease; }
+        .results-title { font-size: 1.3em; color: var(--accent-success); margin-bottom: 20px; font-weight: 600; transition: all 0.3s ease; }
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .result-card { background: var(--bg-tertiary); border-radius: 8px; padding: 15px; border-left: 4px solid var(--accent-secondary); transition: all 0.3s ease; }
+        .result-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-light); border-color: var(--accent-primary); }
+        .result-name { font-weight: 600; color: var(--text-primary); margin-bottom: 8px; font-size: 1.1em; transition: all 0.3s ease; }
+        .result-value { color: var(--text-muted); transition: all 0.3s ease; }
+        .person-config-group { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
+        .person-input-item { display: flex; align-items: center; gap: 10px; }
+        .person-input-item label { font-weight: 500; color: var(--text-secondary); min-width: auto; white-space: nowrap; }
+        .person-input-item input { width: 100px; }
+        .radio-icon { width: 24px; height: 24px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
+        .machine-radio-item { padding: 8px 15px; min-height: auto; align-items: center; }
+        .ingredient-icon { width: 36px; height: 36px; object-fit: contain; border-radius: 4px; flex-shrink: 0; }
+        .ingredient-with-icon { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .ingredient-text { flex: 1; }
+        .result-name { font-weight: 600; color: var(--text-primary); margin-bottom: 8px; font-size: 1.1em; transition: all 0.3s ease; }
+        .result-value { color: var(--text-muted); transition: all 0.3s ease; }
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .result-card { background: var(--bg-tertiary); border-radius: 8px; padding: 15px; border-left: 4px solid var(--accent-secondary); transition: all 0.3s ease; }
+        .result-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-light); border-color: var(--accent-primary); }
+        @media (max-width: 768px) { .content { padding: 20px; } .input-group { flex-direction: column; align-items: flex-start; } .checkbox-group { flex-direction: row; gap: 15px; justify-content: flex-start; } .checkbox-item { flex: 0 0 auto; margin-bottom: 0; } .result-grid { grid-template-columns: 1fr; } input[type="number"], select { width: 100%; } .theme-toggle { top: 10px; right: 10px; } .back-button { top: 10px; left: 10px; padding: 8px 15px; font-size: 0.9em; } .radio-group { gap: 10px; } .radio-item { padding: 8px 12px; font-size: 0.9em; } .person-config-group { flex-direction: column; gap: 15px; align-items: flex-start; } .person-input-item { width: 100%; } .person-input-item input { width: 120px; } }
+    </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
 function ElectricCalculator() {
-
-    // 原油高温转石油比例1:1
-    // 石油高温转高硫天然气比例1:1
-    // 高硫天然气低温转天然气和硫比例1:0.67:0.33
-    // 污染蒸馏转成水泥土比例1:0.99:0.01
-
-    const CYCLE_TO_SECOND = 600;
+    const CYCLE_TO_SECOND = 600; // 周期转秒数
 
     const [machine, setMachine] = React.useState("捕草发电");
-    const [result, setResult] = React.useState();
+    const [result, setResult] = React.useState(null);
     const [土星动物捕草数量, set土星动物捕草数量] = React.useState(1);
     const [油井数量, set油井数量] = React.useState(1);
     const [污染水处理方式, set污染水处理方式] = React.useState("不处理");
@@ -34,29 +83,50 @@ function ElectricCalculator() {
     const [植物野生, set植物野生] = React.useState(false);
     const [人工收获, set人工收获] = React.useState(true);
     const [施肥加速, set施肥加速] = React.useState(false);
+    const [isDarkTheme, setIsDarkTheme] = React.useState(false);
 
-    // 单位：质量：KG，能量：KJ，功率：KW
+    React.useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        setIsDarkTheme(mediaQuery.matches);
+
+        const handleChange = (e) => {
+            setIsDarkTheme(e.matches);
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
+
+    React.useEffect(() => {
+        document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
+    }, [isDarkTheme]);
+
+    const goToHome = () => {
+        window.location.href = 'index.html';
+    };
+
+    const toggleTheme = () => {
+        setIsDarkTheme(!isDarkTheme);
+    };
+
     const calculateRequirements = () => {
         let 计算结果 = null;
-        if (machine == "捕草发电") {
+
+        if (machine === "捕草发电") {
             let 一台氢气发电机功率 = 0.8;
             let 一台氢气发电机消耗氢气_每秒 = 0.1;
             let 一株土星动物捕草产氢气_每秒 = 167/4000;
 
             let 一株捕草可供氢气发电机数量 = 一株土星动物捕草产氢气_每秒 / 一台氢气发电机消耗氢气_每秒;
             let 一株捕草可输出电力 = 一株捕草可供氢气发电机数量 * 一台氢气发电机功率;
+
             计算结果 = {
-                氢气发电机数量: parseFloat(一株捕草可供氢气发电机数量*土星动物捕草数量).toFixed(2) + "台",
-                电力总功率: parseFloat(一株捕草可输出电力*土星动物捕草数量).toFixed(2) + "KW",
-                每周期可产电能: parseFloat(一株捕草可输出电力*土星动物捕草数量*CYCLE_TO_SECOND).toFixed(2) + "KJ",
-            }
-        } else if (machine == "原油裂解发电") {
-            /**
-             * 二氧化碳参与循环时：
-             *  1. 天然气发电机数量 = 2.264433 * 油井数量 / 0.0824625
-             *  2. 浮油生物数量 = 0.675 * 天然气发电机数量
-             *  参考数据：1台油井 -> 27.457台天然气发电机 18.534只浮油生物
-             */
+                氢气发电机数量: parseFloat(一株捕草可供氢气发电机数量 * 土星动物捕草数量).toFixed(2) + "台",
+                电力总功率: parseFloat(一株捕草可输出电力 * 土星动物捕草数量).toFixed(2) + "KW",
+                每周期可产电能: parseFloat(一株捕草可输出电力 * 土星动物捕草数量 * CYCLE_TO_SECOND).toFixed(2) + "KJ",
+            };
+
+        } else if (machine === "原油裂解发电") {
             let 一台油井功率 = 0.24;
             let 一台油井产原油_每秒 = 3.33;
             let 一台油井产天然气_每秒 = 1/30;
@@ -87,10 +157,9 @@ function ElectricCalculator() {
             let 一台油井可供天然气发电机数量;
             let 一台油井发电产二氧化碳需要浮油生物数量;
 
-            // 计算一台油井可供应天然气发电机数量
-            if (二氧化碳处理方式 == "不处理" || 二氧化碳处理方式 == "碳素脱离器") {
+            if (二氧化碳处理方式 === "不处理" || 二氧化碳处理方式 === "碳素脱离器") {
                 一台油井可供天然气发电机数量 = (一台油井产原油_每秒 * 0.67 + 一台油井产天然气_每秒) / 一台天然气发电机消耗天然气_每秒;
-            } else if (二氧化碳处理方式 == "浮油生物") {
+            } else if (二氧化碳处理方式 === "浮油生物") {
                 一台油井可供天然气发电机数量 = 2.264433 / 0.0824625;
                 一台油井发电产二氧化碳需要浮油生物数量 = 0.675 * 一台油井可供天然气发电机数量;
             }
@@ -98,69 +167,66 @@ function ElectricCalculator() {
             let 一台油井发电产污染水_每秒 = 一台油井可供天然气发电机数量 * 一台天然气发电机排放污染水_每秒;
 
             计算结果 = {
-                天然气发电机数量: parseFloat(一台油井可供天然气发电机数量).toFixed(2) + "台",
+                天然气发电机数量: parseFloat(一台油井可供天然气发电机数量 * 油井数量).toFixed(2) + "台",
                 电力总功率: parseFloat(油井数量 * 一台油井可供天然气发电机数量 * 一台天然气发电机功率).toFixed(2) + "KW",
                 每周期可产电能: parseFloat(油井数量 * 一台油井可供天然气发电机数量 * 一台天然气发电机功率 * CYCLE_TO_SECOND).toFixed(2) + "KJ",
             };
 
-            // 总结
-            if (二氧化碳处理方式 == "不处理") {
+            // 二氧化碳处理
+            if (二氧化碳处理方式 === "不处理") {
                 计算结果["产出二氧化碳"] = parseFloat(油井数量 * 一台天然气发电机排放二氧化碳_每秒 * 一台油井可供天然气发电机数量 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
-            } else if (二氧化碳处理方式 == "碳素脱离器") {
+            } else if (二氧化碳处理方式 === "碳素脱离器") {
                 let 一台油井产出二氧化碳_每秒 = 一台天然气发电机排放二氧化碳_每秒 * 一台油井可供天然气发电机数量;
-                计算结果["碳素脱离器数量"] = parseFloat(一台油井产出二氧化碳_每秒 / 一台碳素脱离器消耗二氧化碳_每秒).toFixed(2) + "台";
+                计算结果["碳素脱离器数量"] = parseFloat(一台油井产出二氧化碳_每秒 * 油井数量 / 一台碳素脱离器消耗二氧化碳_每秒).toFixed(2) + "台";
                 let 一台油井产出污染水_每秒 = 一台天然气发电机排放污染水_每秒 * 一台油井可供天然气发电机数量;
                 let 一台油井碳素脱离器产出污染水_每秒 = 一台油井产出二氧化碳_每秒 * 一台碳素脱离器产出污染水_每秒 / 一台碳素脱离器消耗二氧化碳_每秒;
                 let 一台油井碳素脱离器消耗水_每秒 = 一台油井产出二氧化碳_每秒 * 一台碳素脱离器消耗水_每秒 / 一台碳素脱离器消耗二氧化碳_每秒;
-                计算结果["产出污染水"] = parseFloat(油井数量 * 一台油井产出污染水_每秒 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
-                计算结果["消耗水"] = parseFloat(油井数量 * 一台油井碳素脱离器消耗水_每秒 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
-            } else if (二氧化碳处理方式 == "浮油生物") {
-
+                计算结果["产出污染水"] = parseFloat(油井数量 * (一台油井产出污染水_每秒 + 一台油井碳素脱离器产出污染水_每秒) * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
+                计算结果["消耗水"] = parseFloat(油井数量 * (一台油井消耗水_每秒 + 一台油井碳素脱离器消耗水_每秒) * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
+            } else if (二氧化碳处理方式 === "浮油生物") {
+                计算结果["浮油生物数量"] = parseFloat(一台油井发电产二氧化碳需要浮油生物数量 * 油井数量).toFixed(2) + "只";
             }
 
-            if (污染水处理方式 == "不处理") {
+            // 污染水处理
+            if (污染水处理方式 === "不处理") {
                 计算结果["消耗水"] = parseFloat(油井数量 * 一台油井消耗水_每秒 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
-                计算结果["产出污染水"] = parseFloat(油井数量 * 一台天然气发电机排放污染水_每秒 * 一台油井可供天然气发电机数量 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
-            } else if (污染水处理方式 == "净水器") {
+                if (!计算结果["产出污染水"]) {
+                    计算结果["产出污染水"] = parseFloat(油井数量 * 一台天然气发电机排放污染水_每秒 * 一台油井可供天然气发电机数量 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
+                }
+            } else if (污染水处理方式 === "净水器") {
                 let 一台油井净水器产水_每秒 = 一台油井发电产污染水_每秒 * 一台净水器产出水_每秒 / 一台净水器消耗污染水_每秒;
+                计算结果["净水器数量"] = parseFloat(油井数量 * 一台油井发电产污染水_每秒 / 一台净水器消耗污染水_每秒).toFixed(2) + "台";
                 计算结果["消耗过滤介质"] = parseFloat(油井数量 * 一台油井发电产污染水_每秒 * 一台净水器消耗过滤介质_每秒 * CYCLE_TO_SECOND / 一台净水器消耗污染水_每秒).toFixed(2) + "KG/周期";
                 计算结果["产出污染土"] = parseFloat(油井数量 * 一台油井发电产污染水_每秒 * 一台净水器产出污染土_每秒 * CYCLE_TO_SECOND / 一台净水器消耗污染水_每秒).toFixed(2) + "KG/周期";
-                计算结果["水缺口"] = parseFloat((油井数量 * 一台油井消耗水_每秒 - 一台油井净水器产水_每秒) * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
-            } else if (污染水处理方式 == "蒸馏") {
+                计算结果["水缺口"] = parseFloat((油井数量 * 一台油井消耗水_每秒 - 油井数量 * 一台油井净水器产水_每秒) * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
+            } else if (污染水处理方式 === "蒸馏") {
                 let 一台油井蒸馏产水_每秒 = 一台油井发电产污染水_每秒 * 0.99;
                 let 一台油井蒸馏产泥土_每秒 = 一台油井发电产污染水_每秒 * 0.01;
                 计算结果["产出泥土"] = parseFloat(油井数量 * 一台油井蒸馏产泥土_每秒 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
-                计算结果["水缺口"] = parseFloat((油井数量 * 一台油井消耗水_每秒 - 一台油井蒸馏产水_每秒) * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
+                计算结果["水缺口"] = parseFloat((油井数量 * 一台油井消耗水_每秒 - 油井数量 * 一台油井蒸馏产水_每秒) * CYCLE_TO_SECOND).toFixed(2) + "KG/周期";
             }
 
-        } else if (machine == "乙醇发电") {
+        } else if (machine === "乙醇发电") {
             let 一台石油发电机功率 = 2.0;
             let 一台石油发电机消耗燃料_每秒 = 2.0;
             let 一台石油发电机排放二氧化碳_每秒 = 0.5;
             let 一台石油发电机排放污染水_每秒 = 0.75;
 
-            let 一台原油精炼器功率 = 0.48;
-            let 一台原油精炼器消耗原油_每秒 = 10;
-            let 一台原油精炼器产出石油_每秒 = 5;
-            let 一台原油精炼器产出天然气_每秒 = 0.09;
-
-            // "乔木树": { "生长周期": [4.5, 18], "人工培育": { "灌溉": { "污染水": [70, 0] }, "施肥": { "泥土": [10, 0] } }, "木材": { "数量": 1500 } },
-            // 植物野生 人工收获 施肥加速
-
-            // 周期计算
-            let 一棵乔木树生长周期 = 4.5
-            let 一棵乔木树消耗污染水_每秒 = 7/60;
-            let 一棵乔木树消耗泥土_每秒 = 1/60;
-            if (植物野生) 一棵乔木树生长周期 *= 4;
-            if (施肥加速) 一棵乔木树生长周期 /= 2;
-            if (!人工收获) 一棵乔木树生长周期 += 4;
-            // 产量计算
-            let 一棵乔木树产木材_每秒 = 1500 / (一棵乔木树生长周期 * CYCLE_TO_SECOND);
-
             let 一台乙醇蒸馏器消耗木材_每秒 = 1.0;
             let 一台乙醇蒸馏器产出乙醇_每秒 = 0.5;
             let 一台乙醇蒸馏器产出污染土_每秒 = 0.33333;
             let 一台乙醇蒸馏器产出二氧化碳_每秒 = 0.16667;
+
+            // 乔木树计算
+            let 一棵乔木树生长周期 = 4.5;
+            let 一棵乔木树消耗污染水_每秒 = 70 / (一棵乔木树生长周期 * CYCLE_TO_SECOND);
+            let 一棵乔木树消耗泥土_每秒 = 10 / (一棵乔木树生长周期 * CYCLE_TO_SECOND);
+
+            if (植物野生) 一棵乔木树生长周期 *= 4;
+            if (施肥加速) 一棵乔木树生长周期 /= 1.25; // 施肥加速通常是1.25倍
+            if (!人工收获) 一棵乔木树生长周期 += 4;
+
+            let 一棵乔木树产木材_每秒 = 1500 / (一棵乔木树生长周期 * CYCLE_TO_SECOND);
 
             let 一台石油发电机需要乙醇蒸馏器数量 = 一台石油发电机消耗燃料_每秒 / 一台乙醇蒸馏器产出乙醇_每秒;
             let 一台石油发电机需要乔木树数量 = 一台石油发电机需要乙醇蒸馏器数量 * 一台乙醇蒸馏器消耗木材_每秒 / 一棵乔木树产木材_每秒;
@@ -171,72 +237,222 @@ function ElectricCalculator() {
                 乔木树数量: parseFloat(石油发电机数量 * 一台石油发电机需要乔木树数量).toFixed(2) + "棵",
                 污染水缺口: parseFloat(石油发电机数量 * 一台石油发电机污染水缺口_每秒 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期",
                 消耗泥土: parseFloat(石油发电机数量 * 一棵乔木树消耗泥土_每秒 * 一台石油发电机需要乔木树数量 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期",
-                产出二氧化碳: parseFloat(石油发电机数量 * 一台石油发电机需要乙醇蒸馏器数量 * 一台乙醇蒸馏器产出二氧化碳_每秒).toFixed(2) + "KG/周期",
-                产出污染土: parseFloat(石油发电机数量 * 一台石油发电机需要乙醇蒸馏器数量 * 一台乙醇蒸馏器产出污染土_每秒).toFixed(2) + "KG/周期",
+                产出二氧化碳: parseFloat(石油发电机数量 * (一台石油发电机排放二氧化碳_每秒 + 一台石油发电机需要乙醇蒸馏器数量 * 一台乙醇蒸馏器产出二氧化碳_每秒) * CYCLE_TO_SECOND).toFixed(2) + "KG/周期",
+                产出污染土: parseFloat(石油发电机数量 * 一台石油发电机需要乙醇蒸馏器数量 * 一台乙醇蒸馏器产出污染土_每秒 * CYCLE_TO_SECOND).toFixed(2) + "KG/周期",
                 电力总功率: parseFloat(石油发电机数量 * 一台石油发电机功率).toFixed(2) + "KW",
                 每周期可产电能: parseFloat(石油发电机数量 * 一台石油发电机功率 * CYCLE_TO_SECOND).toFixed(2) + "KJ",
-            }
+            };
         }
+
         setResult(计算结果);
-    }
+    };
+
     React.useEffect(() => {
         calculateRequirements();
     }, [machine, 土星动物捕草数量, 油井数量, 污染水处理方式, 二氧化碳处理方式, 浮油生物种类, 石油发电机数量, 植物野生, 人工收获, 施肥加速]);
-    return <div>
-        <div>
-            <div>发电设备</div>
-            <input type="radio" name="发电设备" id="捕草发电" value="捕草发电" checked={machine == "捕草发电"} onChange={e => setMachine(e.target.value)}/><label htmlFor="捕草发电">捕草发电</label>
-            <input type="radio" name="发电设备" id="原油裂解发电" value="原油裂解发电" checked={machine == "原油裂解发电"} onChange={e => setMachine(e.target.value)}/><label htmlFor="原油裂解发电">原油裂解发电</label>
-            <input type="radio" name="发电设备" id="乙醇发电" value="乙醇发电" checked={machine == "乙醇发电"} onChange={e => setMachine(e.target.value)}/><label htmlFor="乙醇发电">乙醇发电</label>
-        </div>
 
-        {machine == "捕草发电" &&
-            <div>
-                <label>土星动物捕草数量</label> <input type="number" min="1" step="1" value={土星动物捕草数量} onChange={e=>set土星动物捕草数量(Number(e.target.value))}/>
+    return (
+        <div className="calculator-container">
+            <div className="header">
+                <button className="back-button" onClick={goToHome} title="返回首页">🏠 返回首页</button>
+                <button className="theme-toggle" onClick={toggleTheme} title="切换主题">
+                    {isDarkTheme ? '☀️' : '🌙'}
+                </button>
+                <h1>⚡ 发电计算器</h1>
+                <p>计算各种发电方式的资源需求和产出，优化你的殖民地电力系统</p>
             </div>
-        }
-        {machine == "原油裂解发电" &&
-            <div>
-                <label>油井数量</label> <input type="number" min="1" step="1" value={油井数量} onChange={e=>set油井数量(Number(e.target.value))}/>
-                <div>
-                    <label>二氧化碳处理方式：</label>
-                    <input type="radio" name="二氧化碳处理方式" id="不处理_二氧化碳" value="不处理" checked={二氧化碳处理方式 == "不处理"} onChange={e=>set二氧化碳处理方式(e.target.value)} /> <label htmlFor="不处理_二氧化碳">不处理</label>
-                    <input type="radio" name="二氧化碳处理方式" id="碳素脱离器" value="碳素脱离器" checked={二氧化碳处理方式 == "碳素脱离器"} onChange={e=>set二氧化碳处理方式(e.target.value)} /> <label htmlFor="碳素脱离器">碳素脱离器</label>
-                    <input type="radio" name="二氧化碳处理方式" id="浮油生物" value="浮油生物" checked={二氧化碳处理方式 == "浮油生物"} onChange={e=>set二氧化碳处理方式(e.target.value)} /> <label htmlFor="浮油生物">浮油生物</label>
-                </div>
-                {二氧化碳处理方式 == "浮油生物" && <div>
-                    <div>
-                        <label>浮油生物种类：</label>
-                        <input type="radio" name="浮油生物种类" id="种类_浮油生物" value="浮油生物" checked={浮油生物种类 == "浮油生物"} onChange={e=>set浮油生物种类(e.target.value)} /> <label htmlFor="种类_浮油生物">浮油生物</label>
-                        <input type="radio" name="浮油生物种类" id="种类_熔岩浮油生物" value="熔岩浮油生物" checked={浮油生物种类 == "熔岩浮油生物"} onChange={e=>set浮油生物种类(e.target.value)} /> <label htmlFor="种类_熔岩浮油生物">熔岩浮油生物</label>
+
+            <div className="content">
+                <div className="section">
+                    <div className="section-title">🔌 发电设备选择</div>
+                    <div className="radio-group">
+                        <label className="radio-item">
+                            <input type="radio" name="发电设备" value="捕草发电" checked={machine === "捕草发电"} onChange={e => setMachine(e.target.value)}/>
+                            {图片["土星动物捕草"] && <img src={图片["土星动物捕草"]} alt="捕草发电" className="radio-icon" />}
+                            <span>捕草发电</span>
+                        </label>
+                        <label className="radio-item">
+                            <input type="radio" name="发电设备" value="原油裂解发电" checked={machine === "原油裂解发电"} onChange={e => setMachine(e.target.value)}/>
+                            {图片["油井"] && <img src={图片["油井"]} alt="原油裂解发电" className="radio-icon" />}
+                            <span>原油裂解发电</span>
+                        </label>
+                        <label className="radio-item">
+                            <input type="radio" name="发电设备" value="乙醇发电" checked={machine === "乙醇发电"} onChange={e => setMachine(e.target.value)}/>
+                            {图片["乙醇蒸馏器"] && <img src={图片["乙醇蒸馏器"]} alt="乙醇发电" className="radio-icon" />}
+                            <span>乙醇发电</span>
+                        </label>
                     </div>
-                </div>}
-                <div>
-                    <label>污染水处理方式：</label>
-                    <input type="radio" name="污染水处理方式" id="不处理_污染水" value="不处理" checked={污染水处理方式 == "不处理"} onChange={e=>set污染水处理方式(e.target.value)} /> <label htmlFor="不处理_污染水">不处理</label>
-                    <input type="radio" name="污染水处理方式" id="净水器" value="净水器" checked={污染水处理方式 == "净水器"} onChange={e=>set污染水处理方式(e.target.value)} /> <label htmlFor="净水器">净水器</label>
-                    <input type="radio" name="污染水处理方式" id="蒸馏" value="蒸馏" checked={污染水处理方式 == "蒸馏"} onChange={e=>set污染水处理方式(e.target.value)} /> <label htmlFor="蒸馏">蒸馏</label>
                 </div>
+
+                {machine === "捕草发电" && (
+                    <div className="section">
+                        <div className="section-title">🌿 捕草发电配置</div>
+                        <div className="person-config-group">
+                            <div className="person-input-item">
+                                <label>土星动物捕草数量:</label>
+                                <input type="number" min="1" step="1" value={土星动物捕草数量} onChange={e => set土星动物捕草数量(Number(e.target.value))}/>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {machine === "原油裂解发电" && (
+                    <div className="section">
+                        <div className="section-title">🛢️ 原油裂解发电配置</div>
+                        <div className="person-config-group">
+                            <div className="person-input-item">
+                                <label>油井数量:</label>
+                                <input type="number" min="1" step="1" value={油井数量} onChange={e => set油井数量(Number(e.target.value))}/>
+                            </div>
+                        </div>
+
+                        <div className="input-group">
+                            <div>二氧化碳处理方式：</div>
+                            <div className="radio-group">
+                                <label className="radio-item">
+                                    <input type="radio" name="二氧化碳处理方式" value="不处理" checked={二氧化碳处理方式 === "不处理"} onChange={e => set二氧化碳处理方式(e.target.value)} />
+                                    <span>不处理</span>
+                                </label>
+                                <label className="radio-item">
+                                    <input type="radio" name="二氧化碳处理方式" value="碳素脱离器" checked={二氧化碳处理方式 === "碳素脱离器"} onChange={e => set二氧化碳处理方式(e.target.value)} />
+                                    {图片["碳素脱离器"] && <img src={图片["碳素脱离器"]} alt="碳素脱离器" className="radio-icon" />}
+                                    <span>碳素脱离器</span>
+                                </label>
+                                <label className="radio-item">
+                                    <input type="radio" name="二氧化碳处理方式" value="浮油生物" checked={二氧化碳处理方式 === "浮油生物"} onChange={e => set二氧化碳处理方式(e.target.value)} />
+                                    {图片["浮油生物"] && <img src={图片["浮油生物"]} alt="浮油生物" className="radio-icon" />}
+                                    <span>浮油生物</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {二氧化碳处理方式 === "浮油生物" && (
+                            <div className="input-group">
+                                <div>浮油生物种类：</div>
+                                <div className="radio-group">
+                                    <label className="radio-item">
+                                        <input type="radio" name="浮油生物种类" value="浮油生物" checked={浮油生物种类 === "浮油生物"} onChange={e => set浮油生物种类(e.target.value)} />
+                                        {图片["浮油生物"] && <img src={图片["浮油生物"]} alt="浮油生物" className="radio-icon" />}
+                                        <span>浮油生物</span>
+                                    </label>
+                                    <label className="radio-item">
+                                        <input type="radio" name="浮油生物种类" value="熔岩浮油生物" checked={浮油生物种类 === "熔岩浮油生物"} onChange={e => set浮油生物种类(e.target.value)} />
+                                        {图片["熔岩浮油生物"] && <img src={图片["熔岩浮油生物"]} alt="熔岩浮油生物" className="radio-icon" />}
+                                        <span>熔岩浮油生物</span>
+                                    </label>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="input-group">
+                            <div>污染水处理方式：</div>
+                            <div className="radio-group">
+                                <label className="radio-item">
+                                    <input type="radio" name="污染水处理方式" value="不处理" checked={污染水处理方式 === "不处理"} onChange={e => set污染水处理方式(e.target.value)} />
+                                    <span>不处理</span>
+                                </label>
+                                <label className="radio-item">
+                                    <input type="radio" name="污染水处理方式" value="净水器" checked={污染水处理方式 === "净水器"} onChange={e => set污染水处理方式(e.target.value)} />
+                                    {图片["净水器"] && <img src={图片["净水器"]} alt="净水器" className="radio-icon" />}
+                                    <span>净水器</span>
+                                </label>
+                                <label className="radio-item">
+                                    <input type="radio" name="污染水处理方式" value="蒸馏" checked={污染水处理方式 === "蒸馏"} onChange={e => set污染水处理方式(e.target.value)} />
+                                    {图片["蒸馏"] && <img src={图片["蒸馏"]} alt="蒸馏" className="radio-icon" />}
+                                    <span>蒸馏</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {machine === "乙醇发电" && (
+                    <div className="section">
+                        <div className="section-title">🌳 乙醇发电配置</div>
+                        <div className="person-config-group">
+                            <div className="person-input-item">
+                                <label>石油发电机数量:</label>
+                                <input type="number" min="1" step="1" value={石油发电机数量} onChange={e => set石油发电机数量(Number(e.target.value))}/>
+                            </div>
+                        </div>
+
+                        <div className="input-group">
+                            <div>农业配置：</div>
+                            <div className="checkbox-group">
+                                <div className="checkbox-item">
+                                    <input type="checkbox" id="植物野生" checked={植物野生} onChange={e => set植物野生(e.target.checked)} />
+                                    <label htmlFor="植物野生">植物野生</label>
+                                </div>
+                                <div className="checkbox-item">
+                                    <input type="checkbox" id="人工收获" checked={人工收获} onChange={e => set人工收获(e.target.checked)} />
+                                    <label htmlFor="人工收获">人工收获</label>
+                                </div>
+                                <div className="checkbox-item">
+                                    <input type="checkbox" id="施肥加速" checked={施肥加速} onChange={e => set施肥加速(e.target.checked)} />
+                                    <label htmlFor="施肥加速">施肥加速</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {result && (
+                    <div className="results-section">
+                        <div className="results-title">📊 计算结果</div>
+                        <div className="result-grid">
+                            {Object.keys(result).map((key, index) => {
+                                // 根据键名获取对应的图标
+                                const getIconForKey = (keyName) => {
+                                    const iconMap = {
+                                        "氢气发电机数量": "氢气发电机",
+                                        "天然气发电机数量": "天然气发电机",
+                                        "乙醇蒸馏器数量": "乙醇蒸馏器",
+                                        "碳素脱离器数量": "碳素脱离器",
+                                        "净水器数量": "净水器",
+                                        "浮油生物数量": "浮油生物",
+                                        "乔木树数量": "乔木树",
+                                        "电力总功率": "电力",
+                                        "每周期可产电能": "电池",
+                                        "产出二氧化碳": "二氧化碳",
+                                        "产出污染水": "污染水",
+                                        "消耗水": "水",
+                                        "水缺口": "水",
+                                        "污染水缺口": "污染水",
+                                        "消耗泥土": "泥土",
+                                        "产出污染土": "污染土",
+                                        "产出泥土": "泥土",
+                                        "消耗过滤介质": "沙子"
+                                    };
+                                    return 图片[iconMap[keyName]] || null;
+                                };
+
+                                const iconUrl = getIconForKey(key);
+
+                                return (
+                                    <div key={index} className="result-card">
+                                        <div className="ingredient-with-icon">
+                                            {iconUrl && (
+                                                <img src={iconUrl} alt={key} className="ingredient-icon" />
+                                            )}
+                                            <div className="ingredient-text">
+                                                <div className="result-name">{key}</div>
+                                                <div className="result-value">{result[key]}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
             </div>
-        }
-        {machine == "乙醇发电" &&
-            <div>
-                <label>石油发电机数量</label> <input type="number" min="1" step="1" value={石油发电机数量} onChange={e=>set石油发电机数量(Number(e.target.value))}/>
-                <div>
-                    <label>农业配置</label>
-                    <input type="checkbox" id="植物野生" value={植物野生} checked={植物野生} onChange={e=>set植物野生(e.target.checked)} /> <label htmlFor="植物野生">植物野生</label>
-                    <input type="checkbox" id="人工收获" value={人工收获} checked={人工收获} onChange={e=>set人工收获(e.target.checked)} /> <label htmlFor="人工收获">人工收获</label>
-                    <input type="checkbox" id="施肥加速" value={施肥加速} checked={施肥加速} onChange={e=>set施肥加速(e.target.checked)} /> <label htmlFor="施肥加速">施肥加速</label>
-                </div>
-            </div>
-        }
-        {result && Object.keys(result).map((key, index) => <div key={index}>
-            {key}: {result[key]}
-        </div>)}
-    </div>
+        </div>
+    );
 }
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<ElectricCalculator />);
 </script>
 </body>
 </html>
+```

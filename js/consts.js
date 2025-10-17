@@ -348,6 +348,15 @@ const 图片 = {
     "燃气灶": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%87%83%E6%B0%94%E7%81%B6.png/100px-%E7%87%83%E6%B0%94%E7%81%B6.png?633df1",
     "油炸锅": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E6%B2%B9%E7%82%B8%E9%94%85.png/100px-%E6%B2%B9%E7%82%B8%E9%94%85.png?7a8736",
     "熏炉": "https://oxygennotincluded.wiki.gg/zh/images/thumb/%E7%86%8F%E7%82%89.png/100px-%E7%86%8F%E7%82%89.png?a7b9ec",
+    "电力": "https://oxygennotincluded.wiki.gg/zh/images/thumb/1/1e/%E7%94%B5%E5%8A%9B%E8%8F%9C%E5%8D%95.png/48px-%E7%94%B5%E5%8A%9B%E8%8F%9C%E5%8D%95.png?c389e7",
+    "电池": "https://oxygennotincluded.wiki.gg/zh/images/thumb/9/94/%E5%B7%A8%E5%9E%8B%E8%93%84%E7%94%B5%E6%B1%A0.png/100px-%E5%B7%A8%E5%9E%8B%E8%93%84%E7%94%B5%E6%B1%A0.png?60a5b1",
+    "氢气发电机": "https://oxygennotincluded.wiki.gg/zh/images/thumb/b/ba/%E6%B0%A2%E6%B0%94%E5%8F%91%E7%94%B5%E6%9C%BA.png/100px-%E6%B0%A2%E6%B0%94%E5%8F%91%E7%94%B5%E6%9C%BA.png?7cb712",
+    "碳素脱离器": "https://oxygennotincluded.wiki.gg/zh/images/thumb/a/aa/%E7%A2%B3%E7%B4%A0%E8%84%B1%E7%A6%BB%E5%99%A8.png/100px-%E7%A2%B3%E7%B4%A0%E8%84%B1%E7%A6%BB%E5%99%A8.png?f3aaa8",
+    "净水器": "https://oxygennotincluded.wiki.gg/zh/images/thumb/3/31/%E5%87%80%E6%B0%B4%E5%99%A8.png/100px-%E5%87%80%E6%B0%B4%E5%99%A8.png?d546ba",
+    "天然气发电机": "https://oxygennotincluded.wiki.gg/zh/images/thumb/5/53/%E5%A4%A9%E7%84%B6%E6%B0%94%E5%8F%91%E7%94%B5%E6%9C%BA.png/100px-%E5%A4%A9%E7%84%B6%E6%B0%94%E5%8F%91%E7%94%B5%E6%9C%BA.png?28f928",
+    "石油发电机": "https://oxygennotincluded.wiki.gg/zh/images/thumb/0/04/%E7%9F%B3%E6%B2%B9%E5%8F%91%E7%94%B5%E6%9C%BA.png/100px-%E7%9F%B3%E6%B2%B9%E5%8F%91%E7%94%B5%E6%9C%BA.png?30ae88",
+    "乙醇蒸馏器": "https://oxygennotincluded.wiki.gg/zh/images/thumb/c/c0/%E4%B9%99%E9%86%87%E8%92%B8%E9%A6%8F%E5%99%A8.png/100px-%E4%B9%99%E9%86%87%E8%92%B8%E9%A6%8F%E5%99%A8.png?ba6dbe",
+    "油井": "https://oxygennotincluded.wiki.gg/zh/images/thumb/9/96/%E6%B2%B9%E4%BA%95.png/100px-%E6%B2%B9%E4%BA%95.png?4e91fa",
 
     // 火箭
     "蒸汽引擎": "https://oxygennotincluded.wiki.gg/zh/images/thumb/c/cb/%E8%92%B8%E6%B1%BD%E5%BC%95%E6%93%8E.png/100px-%E8%92%B8%E6%B1%BD%E5%BC%95%E6%93%8E.png?a9a5d0",
