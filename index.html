@@ -113,6 +113,19 @@
                 </ul>
                 <button class="tool-button">查看数据</button>
             </div>
+
+            <div class="tool-card" onclick="navigateTo('electric-calculator.html')">
+                <span class="tool-icon">⚡</span>
+                <h2 class="tool-title">发电计算器</h2>
+                <p class="tool-description">计算各种发电方式的资源需求和电力输出</p>
+                <ul class="tool-features">
+                    <li>捕草发电计算</li>
+                    <li>原油裂解发电</li>
+                    <li>乙醇发电系统</li>
+                    <li>资源循环分析</li>
+                </ul>
+                <button class="tool-button">开始计算</button>
+            </div>
         </div>
 
         <div class="footer">
@@ -148,15 +161,7 @@
 
         // 页面跳转
         function navigateTo(url) {
-            if (url === "food-calculator.html" ||
-                url === "critter-calculator.html" ||
-                url === "rocket-calculator.html" ||
-                url === "geyser-calculator.html" ||
-                url === "liquid-data.html") {
-                window.location.href = url;
-            } else {
-                alert("尽请期待~");
-            }
+            window.location.href = url;
         }
 
         // 初始化
